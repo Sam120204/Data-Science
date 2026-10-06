@@ -1,21 +1,18 @@
-# Source records
+# Source records and provenance
 
 The catalog contains **42 references**, identified consistently as **R01–R42**.
-It includes research papers, official documentation, implementation resources,
-and a framework publication.
+These records support the integrated [research](../RESEARCH.md) and
+[references](../REFERENCES.md).
 
 | File | Purpose |
 |---|---|
-| [verified-sources.json](verified-sources.json) | Titles, authors, URLs, publication dates, access records, review depth, and qualifications |
+| [verified-sources.json](verified-sources.json) | Titles, authors, paper/PDF URLs, dates, review depth, and qualifications |
 | [references.bib](references.bib) | BibTeX bibliography using the same reference IDs |
+| [evidence-notes.json](evidence-notes.json) | 16 source-level audit entries retaining evidence locators and limitations |
 | [repository-snapshots.json](repository-snapshots.json) | Six upstream repository revisions and reported licenses |
-| [retrieval-notes.md](retrieval-notes.md) | Search scope, source verification, review depth, and evidence boundaries |
+| [retrieval-notes.md](retrieval-notes.md) | Search scope, verification depth, and evidence boundaries |
 
-For a human-readable introduction to the sources, use the
-[annotated reading list](../literature/reading-list.md). The
-[evidence ledger](../literature/evidence-ledger.md) records how particular
-findings are used and qualified.
-
-Access records are dated **6 October 2026**. Source status reflects the recorded
-retrieval, and live pages may change. Full paper texts and dataset contents are
-linked through their original sources rather than redistributed here.
+Access records are dated **6 October 2026**. Live pages may change. Research
+findings are explained in place in the subject-organized documents; these files
+retain citation provenance rather than providing another report to read.
+Papers and datasets are linked through their original sources.

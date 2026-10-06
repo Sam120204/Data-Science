@@ -1,23 +1,12 @@
 # Research
 
-Each topic contains a literature synthesis, evidence analysis, experimental
-methodology, implementation resources, and source records.
+Research topics combine technical explanation, qualified literature findings,
+experimental work, and reproducible source records.
 
-## Topics
-
-| Topic | Research focus | Stage |
+| Topic | Research focus | Current stage |
 |---|---|---|
-| [Sentiment Analysis: Classic NLP vs. LLMs](sentiment-analysis/README.md) | Choosing sentiment methods under quality, cost, latency, and interpretability constraints | Literature review and experimental design |
+| [Sentiment Analysis: Classic NLP vs. LLMs](sentiment-analysis/README.md) | Selecting sentiment systems under quality, cost, latency, and interpretability constraints | Literature synthesis, runnable baselines, and smoke execution; representative-data evaluation pending |
 
-## Organization
-
-| Directory | Contents |
-|---|---|
-| `literature/` | Main review, evidence ledger, additional findings, and annotated references |
-| `methodology/` | Evaluation protocol and method comparison |
-| `resources/` | Implementations, model checkpoints, and dataset resources |
-| `sources/` | Bibliographic metadata, BibTeX references, retrieval notes, and repository revisions |
-| `archive/` | Earlier drafts and source-integration notes |
-
-Published findings are attributed to their sources. Proposed experiments and
-locally measured results are identified separately.
+Each topic keeps subject-organized Markdown close to code and experiment
+outputs. Published findings, local execution results, and proposed measurements
+are identified explicitly.

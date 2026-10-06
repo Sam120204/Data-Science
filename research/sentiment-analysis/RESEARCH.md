@@ -1,11 +1,9 @@
-# Sentiment analysis: classical NLP, transformer classifiers, and prompted LLMs
+# Sentiment analysis: classical NLP, transformers, and LLMs
 
-Research date: 6 October 2026. Reference IDs link to the
-[annotated bibliography](reading-list.md); evidence and qualifications appear in
-the [evidence ledger](evidence-ledger.md).
-
-Related analysis appears in [additional findings](additional-findings.md), with
-draft provenance in the [archive](../archive/README.md).
+Research date: **6 October 2026**. This synthesis combines the reviewed literature
+and contributed research by subject. Paper links accompany findings; complete
+citations and PDF links appear in [References](REFERENCES.md). Published scores
+are attributed to their original settings and have not been reproduced here.
 
 ## Contents
 
@@ -138,7 +136,9 @@ but only labeled audits can establish whether predictive quality changed.
 **Ambiguity in the labels themselves.** Annotators can disagree about sarcasm,
 mixed opinions, and economic implications. Financial PhraseBank includes subsets
 defined by annotator agreement. A model result on the unanimous subset is not
-directly comparable to one on the broader, more ambiguous subset. ([R06](https://arxiv.org/abs/1307.5336), [R12](https://arxiv.org/abs/1908.10063))
+directly comparable to one on the broader, more ambiguous subset. Annotator
+agreement describes reliability under an annotation design; it is not a strict
+mathematical ceiling on accuracy against adjudicated labels. ([R06](https://arxiv.org/abs/1307.5336), [R12](https://arxiv.org/abs/1908.10063))
 
 **Shortcut learning and coverage.** A model can exploit vocabulary associated
 with a class without learning the intended linguistic distinction. Aggregate
@@ -260,6 +260,9 @@ one forward pass rather than generating a verbal answer token by token.
 **FinBERT** adapts BERT to financial language and financial sentiment labels.
 The Araci paper evaluates Financial PhraseBank and FiQA; the ProsusAI model card
 describes further financial-domain training and financial sentiment fine-tuning.
+The original comparison explored BERT more thoroughly than its neural
+baselines and found modest differences among additional domain-pretraining
+choices. Its gains should not all be attributed solely to domain pretraining.
 “FinBERT” is used by multiple projects, so a reproducible comparison should name
 the exact checkpoint, tokenizer, label mapping, and revision. ([R12](https://arxiv.org/abs/1908.10063), [R30](https://github.com/ProsusAI/finbert), [R34](https://huggingface.co/ProsusAI/finbert))
 
@@ -308,8 +311,9 @@ reasoning. ([R13](https://aclanthology.org/2024.findings-naacl.246/), [R20](http
 
 An explanation such as “negative because of weak demand” is a generated
 justification, not automatically a faithful account of the model's internal
-computation. The 2026 circuit-analysis paper investigates internal mechanisms
-and interventions; that is a different form of evidence from a prose rationale.
+computation. The 2026 circuit-analysis paper investigates Gemma-2-2B and Llama-3.1-8B
+across seven datasets, using available sparse autoencoders and binary-filtered
+transfer data. It studies internal mechanisms and interventions; that is a different form of evidence from a prose rationale.
 ([R27](https://aclanthology.org/2026.acl-long.928/))
 
 ### 4.6 Task-adapted LLMs, SetFit, distillation, and hybrids
@@ -343,7 +347,7 @@ These are design options, not locally verified findings.
 | Wang & Manning, 2012 ([R03](https://aclanthology.org/P12-2018/)) | NB/SVM variants and unigram/bigram sentiment features | Classical baselines can be much stronger than a casual implementation | Historical datasets and competitors; not a 2026 LLM comparison |
 | Araci, 2019 ([R12](https://arxiv.org/abs/1908.10063)) | Financial-domain BERT and neural baselines | Domain-adapted contextual classification is a serious financial sentiment option | Baseline tuning was unequal; benchmark subsets and splits matter |
 | Zhang et al., NAACL 2024 ([R13](https://aclanthology.org/2024.findings-naacl.246/)) | 13 tasks, 26 datasets; prompted LLMs versus trained T5 | LLMs were strong with limited examples; structured and nuanced tasks remained difficult | English only; older LLMs; T5 is a neural model, not a bag-of-words baseline |
-| Srirag et al., ACL Findings 2025 ([R25](https://aclanthology.org/2025.findings-acl.441/)) | Sentiment/sarcasm across Australian, Indian, and British English | Language variety and cross-variety transfer deserve separate evaluation | National varieties simplify dialects; data and annotation coverage are limited |
+| Srirag et al., ACL Findings 2025 ([R25](https://aclanthology.org/2025.findings-acl.441/)) | Sentiment/sarcasm across Australian, Indian, and British English | Language variety and cross-variety transfer deserve separate evaluation | Fine-tuned encoder/decoder experiments; binary sentiment after filtering; national categories and annotation coverage are limited |
 | Teles & Figueiredo, 2025 preprint ([R26](https://arxiv.org/abs/2510.15929)) | Financial sentiment across several models and three datasets | Relative performance varied by dataset; useful material for auditing comparison design | Mixed model families; omitted strong linear baselines; label-description inconsistency |
 | Li et al., ACL 2026 ([R27](https://aclanthology.org/2026.acl-long.928/)) | Sentiment circuits and prompt sensitivity in open-weight LLMs | Knowing sentiment internally and reliably eliciting it can be different problems | Specific models, binary-filtered datasets, available sparse autoencoders |
 | Muhammad et al., journal 2026 ([R40](https://link.springer.com/article/10.1007/s41060-026-01201-x)) | Target-aware Bloomberg financial sentiment; zero/few-shot generative models and lexical/encoder baselines | Strong reported LLM performance on an explicitly target-specific financial task | Four companies; access-restricted article text; baseline task differences; reporting consistency issue |
@@ -373,17 +377,61 @@ limitations acknowledge the small diagnostic set and absence of formal
 significance testing. Treat this source as supplementary evidence, not a decisive
 ranking. ([R35](https://aclanthology.org/2026.dravidianlangtech-1.2/), Tables 1–3 and Limitations)
 
-A complementary financial result appears in Muhammad et al.'s journal version,
-published 2 July 2026 with an earlier 2025 conference version. The dataset has
-1,162 articles and 1,334 target-specific annotation cases involving four
-companies. Table 3 reports five-shot DeepSeek-R1 macro F1 of **0.87**, compared
-with **0.66** for its target/aspect DeBERTa baseline. This supports LLM capability
-in that setting, while the paper's non-target-aware baselines, mixed serving
-interfaces, restricted data access, and an inconsistent accuracy/weighted-recall
-entry limit a broad conclusion. Its return correlations are contemporaneous,
-not evidence of future-return profitability. See the
-[addendum](additional-findings.md) and evidence entry E14 for the complete
-qualifications. ([R40](https://link.springer.com/article/10.1007/s41060-026-01201-x), §§3–4)
+### Target-specific financial news: a closer look
+
+[Muhammad et al. (R40)](https://link.springer.com/article/10.1007/s41060-026-01201-x)
+was published online **2 July 2026**, following a 2025 conference version. Its
+December 2026 issue date is recorded separately in the source metadata.
+
+The dataset concerns Alphabet, Amazon, Netflix, and Nvidia, with news from
+4 September 2023 through 30 January 2024. After excluding articles with no target,
+it contains **1,162 Bloomberg articles** and **1,334 target-specific sentiment
+annotation cases**. Multiple entities can occur in one article, so these counts
+describe different units. The labels represent an investor viewpoint under the
+paper's annotation guidelines.
+
+The paper's §4.1 and Table 3 report:
+
+| Evaluated system | Setting | Reported macro F1 |
+|---|---|---:|
+| VADER | Lexicon/rules | 0.37 |
+| FinBERT | Financial encoder baseline | 0.54 |
+| DeBERTa-v3-ABSA | Target/aspect model, fivefold cross-validation | 0.66 |
+| DeepSeek-R1 | Zero-shot | 0.81 |
+| ChatGPT-o1 | Five-shot | 0.86 |
+| DeepSeek-R1 | Five-shot | 0.87 |
+
+This is evidence of a reported LLM advantage in a specific target-aware task.
+It complements R13's results on structured extraction and scarce labels; the
+papers evaluate different tasks, datasets, models, and supervision settings.
+
+Interpretation requires several qualifications:
+
+- The source contains four companies and one historical time window. It cannot
+  establish general financial-domain superiority.
+- Several baseline models classify sentence/document sentiment rather than
+  being designed for the target-aware contract. The paper acknowledges this
+  difference. It also omits strong TF-IDF + linear classifier baselines.
+- The annotation-agreement exercise uses a shared subset of 150 cases; most
+  remaining cases are individually labeled. Agreement on the shared subset is
+  informative but is not a guarantee of all labels' correctness.
+- Only article metadata/URLs are publicly released. Full Bloomberg content
+  requires the appropriate access, which limits convenient reproduction.
+- The paper uses multiple serving interfaces and default settings. These are
+  less controlled than pinned model revisions with a common recorded decoding
+  configuration.
+- Table 3 contains a consistency issue: Llama 3 8B's one-shot accuracy is 0.52
+  but weighted recall is 0.40. For standard single-label classification over the
+  same examples and labels, support-weighted recall equals accuracy. This flags
+  a reporting/evaluation detail requiring clarification; it does not establish
+  that the separate DeepSeek F1 figure is incorrect.
+- Its return analysis concerns contemporaneous daily sentiment/return
+  relationships. Such relationships do not establish causal effects or a
+  future-return strategy with transaction costs. Model training after the news
+  period also warrants care in any historical decision simulation.
+
+The reported figures were checked against the publisher’s full text and table.
+They have not been reproduced locally.
 
 ## 6. Why classical methods can still be the right choice in 2026
 
@@ -475,7 +523,7 @@ always outperform other methods on surveys.
 
 ## 8. How to compare the methods fairly
 
-The [evaluation protocol](../methodology/evaluation-protocol.md) provides the complete design.
+The [evaluation protocol](EXPERIMENTS.md) provides the complete design.
 Its essential principles are:
 
 1. Define the same targets, labels, context, and abstention policy for every model.
@@ -521,5 +569,6 @@ The most valuable unanswered questions for a concrete project are:
 - Can a validated cascade capture most of the benefit at lower total cost?
 
 Answering those questions requires a controlled evaluation on the intended data.
-This review establishes the methods and evidence needed to design it; it does
-not substitute literature results for an experiment that has not been run.
+This review establishes methods and evidence for that design. The accompanying
+[code and execution records](EXPERIMENTS.md) demonstrate implementation progress;
+constructed-fixture scores do not answer those research questions.

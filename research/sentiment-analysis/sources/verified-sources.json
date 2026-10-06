@@ -562,7 +562,7 @@
     "review_level": "full-text methods/results/limitations inspected",
     "inspected_pdf_sha256": "b8c5f9dda6eac23a89338dcadb09d868a28d2ab4cffbbfd42b016087094f2d4c",
     "research_note": "Financial comparison across several datasets, with both generative and encoder models. Useful as a critical-reading case: mixed taxonomy, omitted strong linear baselines, and a label-description inconsistency.",
-    "qualification": "2025 preprint; methods/results inspected; use cautiously, as explained in the evidence ledger."
+    "qualification": "2025 preprint; methods/results inspected; use cautiously, as discussed in the integrated research and evidence audit notes."
   },
   {
     "id": "R27",

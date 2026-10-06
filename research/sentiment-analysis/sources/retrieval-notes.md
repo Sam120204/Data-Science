@@ -53,10 +53,12 @@ without copying the repositories.
 
 - Historical scores are explicitly attributed to the studied versions and tasks.
 - 2025/2026 sources add contemporary evidence, but are not assumed to settle
-  every deployment question. The evidence ledger identifies methodological
+  every deployment question. The integrated research identifies methodological
   concerns where observed.
 - Hypothetical examples and cost calculations are labeled as such.
-- No current provider price survey, latency measurements, trained baseline,
-  API benchmark, or trading backtest was performed.
+- No current provider price survey, representative-data model benchmark,
+  production latency study, API benchmark, or trading backtest was performed.
+  Original local baseline code and constructed-fixture smoke executions were
+  subsequently added; see [Experiments](../EXPERIMENTS.md).
 - Research summaries and recommendations are original synthesis. Numerical
   findings belong to the cited studies and were not reproduced locally.

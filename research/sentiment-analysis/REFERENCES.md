@@ -1,15 +1,14 @@
 # Annotated papers and primary resources
 
 Research/access date: **6 October 2026**. Bibliographic metadata and review depth
-are recorded in [Source catalog](../sources/verified-sources.json).
-The BibTeX file is [BibTeX bibliography](../sources/references.bib).
+are recorded in [Source catalog](sources/verified-sources.json).
+The BibTeX file is [BibTeX bibliography](sources/references.bib).
 
-Start with **R03, R12, R13, R25, and R27**. Read the
-[evidence ledger](evidence-ledger.md) alongside the papers for qualifications.
-
-R28–R34 are implementation/documentation resources listed separately in
-[Implementation resources](../resources/implementations.md). Original PDFs are linked here; no paper
-files or full copied abstracts are redistributed in this repository.
+Suggested starting papers: **R03, R12, R13, R25, R27, and R40**.
+Findings and qualifications are integrated in [Research](RESEARCH.md).
+Implementation resources R28–R34 and dataset links appear at the end of this
+document. Papers remain hosted by their publishers; direct PDFs are linked
+where available.
 
 <a id="r01"></a>
 ## R01: Thumbs up? Sentiment Classification using Machine Learning Techniques
@@ -295,7 +294,7 @@ BESSTIE evaluates sentiment and sarcasm across Australian, Indian, and British E
 
 Financial comparison across several datasets, with both generative and encoder models. Useful as a critical-reading case: mixed taxonomy, omitted strong linear baselines, and a label-description inconsistency.
 
-**Review note:** 2025 preprint; methods/results inspected; use cautiously, as explained in the evidence ledger.
+**Review note:** 2025 preprint; methods/results inspected; use cautiously, as discussed in the integrated research and evidence audit notes.
 
 <a id="r27"></a>
 ## R27: Uncovering Sentiment Analysis Circuit in Large Language Model
@@ -395,3 +394,41 @@ Official framework describing contextual trustworthiness tradeoffs, including va
 Aspect-based sentiment application using 1,458 Dutch HR survey responses and Dutch BERT-based few-shot approaches. Adds an industrial survey application with multiple feedback aspects.
 
 **Review note:** NLP4HR 2024; abstract/metadata inspected. Independently identified; not assumed to match the missing survey citation in the user draft.
+
+<a id="r28"></a>
+<a id="r29"></a>
+<a id="r30"></a>
+<a id="r31"></a>
+<a id="r32"></a>
+<a id="r33"></a>
+<a id="r34"></a>
+## Implementations, checkpoints, and datasets
+
+These upstream projects provide methods, checkpoints, and datasets. The local
+[code](code/README.md) uses scikit-learn and vaderSentiment; full upstream
+repositories have not been vendored or reproduced. Checked repository commits and
+GitHub-reported licenses are in
+[Repository revisions](sources/repository-snapshots.json).
+License metadata is not a substitute for reviewing the terms of any separate
+model weights, corpus, or downloaded asset.
+
+| Resource | Useful starting point | Why include it | Practical caution |
+|---|---|---|---|
+| [scikit-learn](https://github.com/scikit-learn/scikit-learn) / [text feature documentation](https://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction) [R28](#r28) | `TfidfVectorizer`, `Pipeline`, `LogisticRegression`, `LinearSVC` | Strong sparse baselines; training-only fitting through a pipeline | Preserve negation; tune n-grams and regularization on development data |
+| [vaderSentiment](https://github.com/cjhutto/vaderSentiment) [R29](#r29) | `SentimentIntensityAnalyzer` | Reproducible lexicon/rule baseline | Compound scores are not calibrated class probabilities; financial applicability needs testing |
+| [ProsusAI/finbert](https://github.com/ProsusAI/finbert) [R30] | Original financial classifier implementation | Connects the FinBERT research to training/inference code | Original dependency versions may need an isolated environment; repository code and published checkpoint are different artifacts |
+| [ProsusAI/finbert model card](https://huggingface.co/ProsusAI/finbert) [R34] | Hugging Face text-classification checkpoint | Practical pretrained financial sentiment baseline | Pin revision and tokenizer; inspect `id2label`; check benchmark fine-tuning overlap |
+| [DAMO-NLP-SG/LLM-Sentiment](https://github.com/DAMO-NLP-SG/LLM-Sentiment) [R31] | Task definitions, zero/few-shot scripts, prompts, evaluation | Implementation accompanying R13 / SentiEval | Old API models and SDK assumptions may no longer reproduce the original setup |
+| [huggingface/setfit](https://github.com/huggingface/setfit) [R32] | Sentence-transformer adaptation plus classifier | Efficient limited-label competitor | Use identical support sets and report training seeds; pretrained embedding choice matters |
+| [AI4Finance-Foundation/FinGPT](https://github.com/AI4Finance-Foundation/FinGPT) [R33] | Financial data/model adaptation workflows | Examples of task-adapted generative financial NLP | Record the exact subproject/checkpoint; project-wide claims do not validate every released model |
+| [Loughran–McDonald dictionary](https://sraf.nd.edu/loughranmcdonald-master-dictionary/) [R05] | Domain word lists | Financial tone baseline and domain vocabulary reference | Record dictionary vintage, count normalization, and applicable use terms |
+| [BESSTIE dataset](https://huggingface.co/datasets/unswnlporg/BESSTIE) [R25] | English-variety sentiment and sarcasm data | Cross-variety evaluation beyond generic English benchmarks | Sentiment is binary; verify the current dataset card and license before download |
+
+The BESSTIE dataset link is provided by the verified paper; its dataset contents
+were not downloaded or independently audited here.
+
+For an experiment, use an isolated environment and pin dependencies and model
+revisions. Start with the strong TF-IDF baseline and one contextual classifier,
+then add a prompted LLM under the same labels and input context. The
+[evaluation protocol](EXPERIMENTS.md) describes how to avoid misleading
+comparisons.

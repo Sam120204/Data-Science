@@ -1,36 +1,30 @@
 # Data Science
 
 Research on natural language processing, model evaluation, and practical machine
-learning systems. The current project examines sentiment analysis across
-classical methods, transformer classifiers, and generative language models.
+learning systems.
 
-## Current research
+## Sentiment Analysis: Classic NLP vs. LLMs
 
-### Sentiment Analysis: Classic NLP vs. LLMs
+**Research question:** Why choose classical sentiment analysis in 2026 when an
+LLM can classify text through a prompt?
 
-**Research question:** When does classical NLP remain a practical choice for
-sentiment analysis in 2026, given advances in prompted LLMs?
+The project compares lexicons, sparse supervised models, contextual transformer
+classifiers, prompted LLMs, and hybrids. It examines technical mechanisms,
+quality, annotation needs, cost, latency, interpretability, and financial use.
 
-The review examines linguistic difficulty, domain adaptation, annotation needs,
-predictive quality, inference cost, latency, interpretability, and
-reproducibility, with particular attention to financial text.
-
-| Research component | Current progress |
+| Material | Contents |
 |---|---|
-| Literature and sources | 42 source records, including foundational work and 2025–2026 studies |
-| Method comparison | 14 entries covering lexical, statistical, neural, and hybrid approaches |
-| Evidence analysis | 16 evidence entries with experimental context and limitations |
-| Experimental design | Evaluation protocol prepared; benchmarking remains planned |
+| [Research](research/sentiment-analysis/RESEARCH.md) | Integrated findings organized by task, method, evidence, tradeoff, and application |
+| [Experiments](research/sentiment-analysis/EXPERIMENTS.md) | Implemented work, evaluation design, and remaining benchmark questions |
+| [References](research/sentiment-analysis/REFERENCES.md) | Annotated publications, direct paper/PDF links, code repositories, and datasets |
+| [Research code](research/sentiment-analysis/code/README.md) | Runnable baselines, input validation, shared scoring, and reproduction commands |
 
-**Start here:** [Sentiment analysis research](research/sentiment-analysis/README.md).
+Current outputs include **42 source records**, a **14-method comparison**,
+implemented classical/lexicon baselines, and saved executions on constructed
+smoke examples. Representative-data benchmarks and LLM experiments remain
+pending; smoke scores are execution checks rather than research performance.
 
-## Reading paths
-
-- [Literature review](research/sentiment-analysis/literature/review.md) — problem definition, methods, tradeoffs, and applications.
-- [Evidence ledger](research/sentiment-analysis/literature/evidence-ledger.md) — published findings and their qualifications.
-- [Evaluation protocol](research/sentiment-analysis/methodology/evaluation-protocol.md) — proposed datasets, baselines, splits, and metrics.
-- [Annotated reading list](research/sentiment-analysis/literature/reading-list.md) — primary publications and source links.
-
-All project materials are organized under [research/](research/README.md).
+See the [project overview](research/sentiment-analysis/README.md) for the folder
+structure and progress. Other topics belong under [research/](research/README.md).
 
 Last updated: **6 October 2026**.

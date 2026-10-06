@@ -1,0 +1,10 @@
+id,text,label
+te01,The delivery was fast and the service was excellent.,positive
+te02,I love this wonderful camera.,positive
+te03,The app works perfectly and is easy to use.,positive
+te04,The service was rude and the quality was awful.,negative
+te05,I hate this unreliable app.,negative
+te06,The battery is broken and I am disappointed.,negative
+te07,The camera weighs two hundred grams.,neutral
+te08,The service desk is on the second floor.,neutral
+te09,The team publishes its report on Friday.,neutral

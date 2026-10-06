@@ -1,0 +1,10 @@
+id,label,prediction,correct
+te01,positive,negative,False
+te02,positive,negative,False
+te03,positive,negative,False
+te04,negative,negative,True
+te05,negative,negative,True
+te06,negative,negative,True
+te07,neutral,negative,False
+te08,neutral,negative,False
+te09,neutral,negative,False

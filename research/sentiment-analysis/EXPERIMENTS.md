@@ -1,6 +1,26 @@
-# Proposed evaluation: existing sentiment methods
+# Experiments: implementation, execution, and evaluation design
 
-**Status: experimental design only. No model comparisons have been run.**
+**Status:** Runnable baselines implemented; constructed-fixture smoke checks
+executed. Representative-data benchmarking remains pending.
+
+## Implementation and execution
+
+The [code guide](code/README.md) describes input formats, commands, leakage
+checks, and output records. Local implementations cover TF-IDF + logistic
+regression, TF-IDF + LinearSVC, majority-class prediction, and VADER. A pinned
+FinBERT inference adapter and an imported-prediction scorer support future
+comparisons. The FinBERT adapter has not been executed with model weights.
+
+The [smoke-run records](results/smoke/README.md) contain actual outputs on
+18 constructed training items and nine constructed test items. These examples
+check execution and output structure; their scores do not establish generalization,
+financial-domain performance, or a ranking between model families.
+
+The current code implements fixed, whole-text, three-class polarity. Target-aware
+extraction, hyperparameter search, calibration, confidence intervals, dialect
+slices, and production latency/cost measurement remain evaluation work.
+
+## Evaluation design
 
 The goal is to measure quality and operational cost under the same task contract,
 then identify conditions in which a classical model, contextual classifier,
@@ -223,5 +243,5 @@ evaluate any downstream decision separately from sentiment classification.
 | To be measured | — | — | — | — | — | — | — |
 
 Choose a model only after filling the table with measured results and checking
-the domain/temporal holdout. The current repository contains literature evidence
-and this design, not fabricated benchmark outputs.
+the domain/temporal holdout. The repository contains literature evidence, runnable code, and smoke outputs.
+Populate this benchmark table only from a controlled representative-data study.

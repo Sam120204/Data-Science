@@ -1,0 +1,19 @@
+id,text,label
+tr01,The service was excellent and the staff were helpful.,positive
+tr02,The camera is wonderful and the photos are beautiful.,positive
+tr03,I love the fast delivery and great quality.,positive
+tr04,The app is easy to use and works perfectly.,positive
+tr05,The team delivered impressive growth and strong results.,positive
+tr06,The battery lasts all day and I am very satisfied.,positive
+tr07,The service was terrible and the staff were rude.,negative
+tr08,The camera is broken and the photos are awful.,negative
+tr09,I hate the slow delivery and poor quality.,negative
+tr10,The app is unreliable and crashes repeatedly.,negative
+tr11,The team reported disappointing results and weak demand.,negative
+tr12,The battery failed and I am very disappointed.,negative
+tr13,The service desk opens at nine in the morning.,neutral
+tr14,The camera is available in black and silver.,neutral
+tr15,The delivery arrived on Tuesday.,neutral
+tr16,The app has a menu with three tabs.,neutral
+tr17,The team will publish results next week.,neutral
+tr18,The battery weighs fifty grams.,neutral
