@@ -347,96 +347,57 @@ These are design options, not locally verified findings.
 
 ## 5. What the comparative literature supports
 
-| Source | What was investigated | Defensible takeaway | Qualification |
-|---|---|---|---|
-| Wang & Manning, 2012 ([R03](https://aclanthology.org/P12-2018/)) | NB/SVM variants and unigram/bigram sentiment features | Classical baselines can be much stronger than a casual implementation | Historical datasets and competitors; not a 2026 LLM comparison |
-| Araci, 2019 ([R12](https://arxiv.org/abs/1908.10063)) | Financial-domain BERT and neural baselines | Domain-adapted contextual classification is a serious financial sentiment option | Baseline tuning was unequal; benchmark subsets and splits matter |
-| Zhang et al., NAACL 2024 ([R13](https://aclanthology.org/2024.findings-naacl.246/)) | 13 tasks, 26 datasets; prompted LLMs versus trained T5 | LLMs were strong with limited examples; structured and nuanced tasks remained difficult | English only; older LLMs; T5 is a neural model, not a bag-of-words baseline |
-| Srirag et al., ACL Findings 2025 ([R25](https://aclanthology.org/2025.findings-acl.441/)) | Sentiment/sarcasm across Australian, Indian, and British English | Language variety and cross-variety transfer deserve separate evaluation | Fine-tuned encoder/decoder experiments; binary sentiment after filtering; national categories and annotation coverage are limited |
-| Teles & Figueiredo, 2025 preprint ([R26](https://arxiv.org/abs/2510.15929)) | Financial sentiment across several models and three datasets | Relative performance varied by dataset; useful material for auditing comparison design | Mixed model families; omitted strong linear baselines; label-description inconsistency |
-| Li et al., ACL 2026 ([R27](https://aclanthology.org/2026.acl-long.928/)) | Sentiment circuits and prompt sensitivity in open-weight LLMs | Knowing sentiment internally and reliably eliciting it can be different problems | Specific models, binary-filtered datasets, available sparse autoencoders |
-| Muhammad et al., journal 2026 ([R40](https://link.springer.com/article/10.1007/s41060-026-01201-x)) | Target-aware Bloomberg financial sentiment; zero/few-shot generative models and lexical/encoder baselines | Strong reported LLM performance on an explicitly target-specific financial task | Four companies; access-restricted article text; baseline task differences; reporting consistency issue |
+The studies suggest several useful patterns. Their results depend on the task,
+training data, and model version, so they do not establish one universal winner.
 
-Two concrete findings from R13 illustrate why task definition matters. In its
-Table 1, ChatGPT scores **94.20** on IMDb classification versus **93.93** for the
-fully trained T5 reference, while restaurant-2014 unified aspect extraction
-scores are **54.46** versus **75.31**. IMDb uses accuracy; the structured task
-uses extraction F1. These numbers compare models **within each task**, and must
-not be averaged into a universal sentiment accuracy or presented as current
-2026 model results. These evaluations use 500 sampled test items per dataset;
-the small IMDb difference is not evidence of statistically superior performance.
-([R13](https://aclanthology.org/2024.findings-naacl.246/), Table 1 and Appendix Table 4)
+**Classical methods remain serious baselines.** Wang and Manning showed that
+simple word-based classifiers can perform strongly when their features and
+training are chosen carefully. This supports comparing LLMs against a well-built
+classical model. The study predates current LLMs, so it cannot establish which
+family is better today. ([R03](https://aclanthology.org/P12-2018/))
 
-Recent evidence also needs scrutiny. R26's “LLM” group includes DeBERTa and
-XLM-RoBERTa classifiers, its classical baselines omit logistic regression and
-LinearSVC, and preprocessing uses stopword removal and SVD. Its text gives two
-inconsistent mappings for the financial-news numeric labels. These observations
-limit reproducibility and the scope of its conclusions; they do not prove that
-every reported score is wrong. ([R26](https://arxiv.org/abs/2510.15929), §§3.2–3.3)
+**Fine-tuned transformers offer a useful middle option.** FinBERT shows how
+contextual models trained for financial language can improve sentiment
+classification. Its results support including a financial transformer in the
+comparison, although the original study explored BERT more thoroughly than its
+other neural baselines. ([R12](https://arxiv.org/abs/1908.10063))
 
-R35 reports XLM-R accuracy of 99.7% on its Hinglish test set and 42.5% on a
-400-example adversarial set. This is a targeted robustness warning, not a
-population failure-rate estimate. The paper also describes 25% as chance for a
-three-class problem, which is incorrect for uniform guessing (33.3%). Its
-limitations acknowledge the small diagnostic set and absence of formal
-significance testing. Treat this source as supplementary evidence, not a decisive
-ranking. ([R35](https://aclanthology.org/2026.dravidianlangtech-1.2/), Tables 1–3 and Limitations)
+**LLMs can perform well, but the task matters.** In Zhang et al.'s study, ChatGPT
+and a trained T5 model achieved similar movie-review accuracy: **94.20% and
+93.93%**. For the more detailed task of extracting which aspects were praised or
+criticized, trained T5 performed better. LLMs were particularly useful when few
+labeled examples were available. This English-language study used older LLMs;
+it does not rank today's models. ([R13](https://aclanthology.org/2024.findings-naacl.246/))
 
-### Target-specific financial news: a closer look
+**Financial results are promising, with important limits.** A study of 1,162
+Bloomberg articles about four companies reported the following results for
+sentiment toward named companies:
 
-[Muhammad et al. (R40)](https://link.springer.com/article/10.1007/s41060-026-01201-x)
-was published online **2 July 2026**, following a 2025 conference version. Its
-December 2026 issue date is recorded separately in the source metadata.
+| Method | Reported macro F1 |
+|---|---:|
+| VADER | 0.37 |
+| FinBERT | 0.54 |
+| DeepSeek-R1, prompted with five labeled examples | 0.87 |
 
-The dataset concerns Alphabet, Amazon, Netflix, and Nvidia, with news from
-4 September 2023 through 30 January 2024. After excluding articles with no target,
-it contains **1,162 Bloomberg articles** and **1,334 target-specific sentiment
-annotation cases**. Multiple entities can occur in one article, so these counts
-describe different units. The labels represent an investor viewpoint under the
-paper's annotation guidelines.
+Macro F1 combines precision and recall while giving each sentiment class equal
+weight; higher is better. The LLM scored strongly in this setting, but several
+baselines were not designed for company-specific sentiment, and strong sparse
+linear classifiers were omitted. Full article text has restricted access, and
+some table entries need clarification. These are published results, not local
+measurements or evidence of trading profitability.
+([R40](https://link.springer.com/article/10.1007/s41060-026-01201-x))
 
-The paper's §4.1 and Table 3 report:
+**High scores still need checks in realistic conditions.** Research on English
+varieties and prompt sensitivity shows that language differences and instruction
+wording can change results. Test the language, domain, and inputs the system
+will actually face. ([R25](https://aclanthology.org/2025.findings-acl.441/),
+[R27](https://aclanthology.org/2026.acl-long.928/))
 
-| Evaluated system | Setting | Reported macro F1 |
-|---|---|---:|
-| VADER | Lexicon/rules | 0.37 |
-| FinBERT | Financial encoder baseline | 0.54 |
-| DeBERTa-v3-ABSA | Target/aspect model, fivefold cross-validation | 0.66 |
-| DeepSeek-R1 | Zero-shot | 0.81 |
-| ChatGPT-o1 | Five-shot | 0.86 |
-| DeepSeek-R1 | Five-shot | 0.87 |
-
-This is evidence of a reported LLM advantage in a specific target-aware task.
-It complements R13's results on structured extraction and scarce labels; the
-papers evaluate different tasks, datasets, models, and supervision settings.
-
-Interpretation requires several qualifications:
-
-- The source contains four companies and one historical time window. It cannot
-  establish general financial-domain superiority.
-- Several baseline models classify sentence/document sentiment rather than
-  being designed for the target-aware contract. The paper acknowledges this
-  difference. It also omits strong TF-IDF + linear classifier baselines.
-- The annotation-agreement exercise uses a shared subset of 150 cases; most
-  remaining cases are individually labeled. Agreement on the shared subset is
-  informative but is not a guarantee of all labels' correctness.
-- Only article metadata/URLs are publicly released. Full Bloomberg content
-  requires the appropriate access, which limits convenient reproduction.
-- The paper uses multiple serving interfaces and default settings. These are
-  less controlled than pinned model revisions with a common recorded decoding
-  configuration.
-- Table 3 contains a consistency issue: Llama 3 8B's one-shot accuracy is 0.52
-  but weighted recall is 0.40. For standard single-label classification over the
-  same examples and labels, support-weighted recall equals accuracy. This flags
-  a reporting/evaluation detail requiring clarification; it does not establish
-  that the separate DeepSeek F1 figure is incorrect.
-- Its return analysis concerns contemporaneous daily sentiment/return
-  relationships. Such relationships do not establish causal effects or a
-  future-return strategy with transaction costs. Model training after the news
-  period also warrants care in any historical decision simulation.
-
-The reported figures were checked against the publisher’s full text and table.
-They have not been reproduced locally.
+The conclusion is that classical models, fine-tuned transformers, and prompted
+LLMs all deserve consideration. Classical models remain useful when efficiency
+and stable labels matter; transformers and LLMs can justify additional cost when
+they reduce important errors. Choose using the same relevant test data and
+measured cost and latency, rather than model age or one published score.
 
 ## 6. Why classical methods can still be the right choice in 2026
 
