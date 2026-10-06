@@ -24,7 +24,7 @@ The findings below guide those experiments; execution details are in
 5. [What the papers support](#5-what-the-comparative-literature-supports)
 6. [Reasons to choose classical NLP](#6-why-classical-methods-can-still-be-the-right-choice-in-2026)
 7. [Where classical methods remain useful](#7-where-classical-methods-remain-useful-in-practice)
-8. [Deciding whether an LLM is worth the cost](#8-how-to-decide-whether-an-llm-is-worth-the-additional-cost)
+8. [Choosing between classical methods and LLMs](#8-how-to-choose-between-classical-methods-and-llms)
 9. [Conclusions and open questions](#9-research-conclusions-and-open-questions)
 
 ## 1. The answer to the research question
@@ -56,8 +56,8 @@ versioning, and monitoring also require work.
 ([R13](https://aclanthology.org/2024.findings-naacl.246/),
 [R14](https://arxiv.org/abs/2304.04339), [R20](https://arxiv.org/abs/2310.11324))
 
-The question therefore becomes: **when does an LLM improve important errors
-enough to justify the total cost and complexity of using it?** Older studies help
+The question therefore becomes: **which approach best meets the task's quality,
+cost, latency, and interpretability requirements?** Older studies help
 explain the tradeoffs, but cannot rank every current model. This review does not
 establish a universal winner in 2026.
 
@@ -405,11 +405,17 @@ sentiment toward named companies:
 | DeepSeek-R1, prompted with five labeled examples | 0.87 |
 
 Macro F1 combines precision and recall while giving each sentiment class equal
-weight; higher is better. The LLM scored strongly in this setting, but several
-baselines were not designed for company-specific sentiment, and strong sparse
-linear classifiers were omitted. Full article text has restricted access, and
-some table entries need clarification. These are published results, not local
-measurements or evidence of trading profitability.
+weight; higher is better. **These results show that prompted DeepSeek-R1
+outperformed VADER and FinBERT on this company-specific financial dataset.**
+They provide concrete evidence of an LLM advantage over the selected lexicon
+and transformer-classifier baselines in this setting.
+
+The scope still matters: several baselines were not designed for company-specific
+sentiment, and strong TF-IDF + linear classifiers were omitted. The study covers
+four companies, full article text has restricted access, and some table entries
+need clarification. It does not establish superiority over every classical
+method or measure cost and latency in the comparison shown here. These are
+published results, not local measurements or evidence of trading profitability.
 ([R40](https://link.springer.com/article/10.1007/s41060-026-01201-x))
 
 **High scores still need checks in realistic conditions.** Research on English
@@ -421,11 +427,12 @@ A small Hinglish study also found weaker performance on difficult examples,
 supporting the need to check robustness beyond ordinary benchmark scores.
 ([R35](https://aclanthology.org/2026.dravidianlangtech-1.2/))
 
-The conclusion is that classical models, fine-tuned transformers, and prompted
-LLMs all deserve consideration. Classical models remain useful when efficiency
-and stable labels matter; transformers and LLMs can justify additional cost when
-they reduce important errors. Choose using the same relevant test data and
-measured cost and latency, rather than model age or one published score.
+The conclusion is that **LLMs can deliver better sentiment predictions**, as
+the financial comparison demonstrates, while classical methods remain useful
+where their quality and operating characteristics meet the task's needs.
+Fine-tuned transformers provide another candidate. Model selection should
+recognize demonstrated LLM gains and compare quality, cost, and latency on
+relevant data; the best choice depends on the application.
 
 ## 6. Why classical methods can still be the right choice in 2026
 
@@ -510,7 +517,7 @@ trading profitability. An expensive model is justified by demonstrated value for
 the intended decision, not by assuming a sentiment score causes that value.
 ([R37](https://doi.org/10.1111/j.1540-6261.2007.01232.x))
 
-## 8. How to decide whether an LLM is worth the additional cost
+## 8. How to choose between classical methods and LLMs
 
 The comparison should establish whether additional model capability produces
 useful gains under the application's requirements. The detailed protocol is in
@@ -543,9 +550,9 @@ probability of correctness, and confidence can become unreliable under drift.
 
 Choose classical NLP when it meets the necessary quality and operating
 requirements at lower measured total cost. Choose a contextual classifier or LLM
-when it delivers enough additional value to justify its costs. Successful
-classification in one prompt is a starting point; evidence from this comparison
-is what supports a deployment decision.
+when its contextual capabilities or richer outputs better serve the application
+within its operating requirements. This comparison identifies where each method
+adds value and supports an evidence-based deployment decision.
 
 ## 9. Research conclusions and open questions
 
@@ -555,11 +562,18 @@ repeatable measurements.** These advantages matter only when the method measures
 the intended sentiment and handles important errors adequately. They do not
 make classical NLP universally more accurate or easier to maintain.
 
-LLMs are attractive when instructions and broad contextual knowledge help with
-scarce labels or richer outputs. Fine-tuned and compact transformer classifiers
-provide another option. All families face ambiguous labels, domain-dependent
-meaning, and changing data, so selecting a capable model is only part of building
-a reliable sentiment system.
+**LLMs also have demonstrated value:** the cited financial study reports
+DeepSeek-R1 outperforming VADER and FinBERT, and broader sentiment research finds
+strong results with limited labeled examples. These findings support LLMs as
+valuable candidates for company-specific interpretation and limited-label tasks.
+Fine-tuned and compact transformer classifiers provide another option.
+([R40](https://link.springer.com/article/10.1007/s41060-026-01201-x),
+[R13](https://aclanthology.org/2024.findings-naacl.246/))
+
+The research question is about **why classical methods remain useful alongside
+LLMs**. All families face ambiguous labels, domain-dependent meaning, and
+changing data, so the choice depends on demonstrated quality and the intended
+workload rather than a general preference for one model family.
 
 The remaining questions require measurements on the intended data:
 
