@@ -1,155 +1,170 @@
 # Sentiment analysis: classical NLP, transformers, and LLMs
 
-This synthesis combines the reviewed literature
-and contributed research by subject. Paper links accompany findings; complete
-citations and PDF links appear in [References](REFERENCES.md). Published scores
-are attributed to their original settings and have not been reproduced here.
+**Research question: Why choose classical sentiment analysis in 2026 when an
+LLM can classify text through a prompt?**
+
+This review explains the problem, why it remains difficult, how existing methods
+address it, and the conditions that make each method useful. Paper links support
+the findings; full citations and PDFs are in [References](REFERENCES.md).
+Published results and engineering recommendations are distinguished from the
+local example runs.
+
+**Current progress:** The literature synthesis and baseline implementations are
+complete for the current scope, with constructed-example execution checks.
+Representative-data comparisons and operating-cost measurements remain pending.
+The findings below guide those experiments; execution details are in
+[Experiments](EXPERIMENTS.md).
 
 ## Contents
 
-1. [Research question and conclusions](#1-the-answer-to-the-research-question)
-2. [Task definition](#2-what-problem-does-sentiment-analysis-solve)
-3. [Why sentiment is difficult](#3-why-is-the-problem-difficult)
-4. [Existing method families](#4-existing-method-families-and-how-they-work)
-5. [Comparative evidence](#5-what-the-comparative-literature-supports)
-6. [Practical selection criteria](#6-why-classical-methods-can-still-be-the-right-choice-in-2026)
-7. [Finance and industry applications](#7-why-this-matters-in-finance-and-industry)
-8. [Fair evaluation](#8-how-to-compare-the-methods-fairly)
+1. [Answer to the research question](#1-the-answer-to-the-research-question)
+2. [What sentiment analysis solves](#2-what-problem-does-sentiment-analysis-solve)
+3. [Root causes of difficulty](#3-why-is-the-problem-difficult)
+4. [How the methods work](#4-existing-method-families-and-how-they-work)
+5. [What the papers support](#5-what-the-comparative-literature-supports)
+6. [Reasons to choose classical NLP](#6-why-classical-methods-can-still-be-the-right-choice-in-2026)
+7. [Where classical methods remain useful](#7-where-classical-methods-remain-useful-in-practice)
+8. [Deciding whether an LLM is worth the cost](#8-how-to-decide-whether-an-llm-is-worth-the-additional-cost)
 9. [Conclusions and open questions](#9-research-conclusions-and-open-questions)
 
 ## 1. The answer to the research question
 
-**People still use classical NLP because the objective is to produce useful,
-reliable sentiment measurements under operational constraints.** The most
-capable general-purpose model is not automatically the best system for a
-specific, repeated classification task.
+**Classical sentiment analysis remains useful when it delivers adequate quality
+with lower total cost, predictable latency, and inspectable decisions.** This is
+most plausible for a stable, repeated task with representative training labels
+or a well-defined dictionary-based measure. It is a conditional model-selection
+argument that must be tested on the intended data.
+([R01](https://aclanthology.org/W02-1011/), [R03](https://aclanthology.org/P12-2018/),
+[R28](https://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction))
 
-For a stable label definition and a representative labeled dataset, word or
-character n-grams with logistic regression or a linear SVM remain legitimate
-baselines. Their advantages include inexpensive CPU inference, local execution,
-direct feature contributions, and reproducible model artifacts. Whether those
-advantages justify deployment depends on measured errors, not their age.
-([R01](https://aclanthology.org/W02-1011/), [R03](https://aclanthology.org/P12-2018/), [R28](https://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction))
+Here, **classical NLP** includes lexicons/rules such as VADER and sparse
+classifiers such as TF-IDF + logistic regression. **Fine-tuned transformer
+classifiers**, including FinBERT, form a separate contextual alternative.
+**Prompted LLMs** interpret instructions and generate labels or richer outputs.
+Compact encoders, SetFit, and hybrid systems make the choice broader than a
+simple classical-versus-LLM contest.
+([R10](https://aclanthology.org/N19-1423/), [R11](https://arxiv.org/abs/1910.01108),
+[R12](https://arxiv.org/abs/1908.10063), [R15](https://arxiv.org/abs/2209.11055))
 
-Prompted LLMs offer a different advantage: they can use a task definition and
-examples without task-specific weight updates. This makes them useful for new
-domains, exploratory analysis, complex extraction, and rapidly changing label
-schemes. They also incur their own costs: model inference, prompt validation,
-output parsing, version management, and quality checks. ([R13](https://aclanthology.org/2024.findings-naacl.246/), [R14](https://arxiv.org/abs/2304.04339), [R20](https://arxiv.org/abs/2310.11324))
+**“One prompt” reduces the work needed to start classification.** It does not
+establish that the labels measure the intended concept, that predictions remain
+reliable on new language, or that serving the model is economical at the required
+volume. LLMs can reduce dependence on task-specific training labels, particularly
+for new or complex tasks, but representative human-labeled evaluation examples
+are still needed to validate them. Prompt selection, output checks, model
+versioning, and monitoring also require work.
+([R13](https://aclanthology.org/2024.findings-naacl.246/),
+[R14](https://arxiv.org/abs/2304.04339), [R20](https://arxiv.org/abs/2310.11324))
 
-The comparison should include a third family: **trained transformer classifiers**
-such as BERT, RoBERTa, and FinBERT. These use contextual representations but
-usually predict a fixed set of labels through a classification head. They often
-provide a practical alternative between sparse linear models and prompted
-generative models. SetFit, distillation, and hybrid pipelines further weaken a
-simple two-way distinction. ([R10](https://aclanthology.org/N19-1423/), [R11](https://arxiv.org/abs/1910.01108), [R12](https://arxiv.org/abs/1908.10063), [R15](https://arxiv.org/abs/2209.11055))
-
-There is no source-supported universal winner in 2026. Published comparisons
-depend on the task, training labels, model versions, language, test distribution,
-and evaluation procedure. A study of GPT-3.5-era models cannot establish the
-relative accuracy of all current LLMs. It can still identify useful evaluation
-questions and observed failure mechanisms. ([R13](https://aclanthology.org/2024.findings-naacl.246/))
+The question therefore becomes: **when does an LLM improve important errors
+enough to justify the total cost and complexity of using it?** Older studies help
+explain the tradeoffs, but cannot rank every current model. This review does not
+establish a universal winner in 2026.
 
 ## 2. What problem does sentiment analysis solve?
 
-Sentiment analysis turns unstructured language into information about attitudes,
-evaluations, or domain-specific favorable and unfavorable implications. A simple
-task maps a review to positive, negative, or neutral. A richer task identifies
-**who expresses which opinion about which target or aspect, with what polarity**.
+Sentiment analysis converts large amounts of unstructured text into consistent
+measurements of attitudes, evaluations, or favorable/unfavorable implications.
+These measurements help people summarize feedback, track document tone, or
+identify news that deserves attention. The useful output depends on what is
+being measured and toward whom.
 
-For example, in “The app is easy to use, but its payment system is unreliable,”
-a document label loses the useful distinction: usability is positive and payment
-reliability is negative. Aspect-based sentiment analysis can preserve it. Some
-tasks provide the aspect in advance; others require extracting the aspect, opinion
-expression, and polarity together. Those are different prediction problems.
-([R07](https://aclanthology.org/S14-2004/), [R13](https://aclanthology.org/2024.findings-naacl.246/))
+For example, “The app is easy to use, but its payment system is unreliable”
+contains positive sentiment about usability and negative sentiment about
+payments. A single document label loses that distinction. Aspect-based analysis
+preserves it; some tasks supply the aspect, while others require extracting both
+the aspect and its sentiment.
+([R07](https://aclanthology.org/S14-2004/),
+[R13](https://aclanthology.org/2024.findings-naacl.246/))
 
-The label must be defined before a model can be evaluated:
+Define the target and label meaning before comparing models:
 
-| Intended measurement | What a label means | Main ambiguity |
+| Task | What the output should measure | Why this affects model choice |
 |---|---|---|
-| Consumer evaluation | Approval or disapproval of a product/service | Different aspects can conflict |
-| Emotional expression | The writer's emotional state | Anger, fear, joy, and sadness are richer than positive/negative |
-| Investor stance | Bullish or bearish view toward a named asset | A view can be speculative rather than factual |
-| Financial news sentiment | Favorable or unfavorable implication for a specified entity under a specified rubric | Time horizon, expectations, and affected entity matter |
-| Document tone | Language expressing negativity, uncertainty, or other categories | Tone is different from realized economic outcomes |
-| Subjectivity | Whether language expresses an opinion rather than a factual assertion | A factual event can still have an unfavorable economic implication |
-| Sentiment intensity | Strength under a defined continuous or ordinal rubric | Scores from different resources are not automatically comparable |
-| Proposition-level stance | Support or opposition toward a specified proposition | Opposition need not involve negative emotional language |
+| Whole-review polarity | Overall approval or disapproval | A fixed-label sparse classifier may be sufficient. |
+| Aspect or company-specific sentiment | An evaluation toward a named aspect/entity | Word counts alone can miss who benefits or suffers. |
+| Financial document tone | Negative, uncertain, or other specified language categories | A fixed domain dictionary can provide an inspectable measure. |
+| Investor stance or financial implications | Bullish/bearish views or implications under a defined horizon | Context and expectations may matter more than emotional wording. |
 
-Emotion recognition, stance detection, sarcasm detection, and toxicity detection
-are related tasks, but their labels are not interchangeable. A negative review
-is not necessarily abusive, and “I fear this stock will rise before I can buy it”
-contains fear alongside a bullish expectation. GoEmotions illustrates the richer
-emotion taxonomy. ([R17](https://aclanthology.org/2020.acl-main.372/))
+Emotion, subjectivity, stance, and intensity are related measurements with their
+own definitions. Fear does not always imply a bearish view; a factual sentence
+can describe an unfavorable event without expressing an opinion. A positive/
+negative classifier does not automatically validate these other outputs.
+([R17](https://aclanthology.org/2020.acl-main.372/))
 
-“Neutral,” “mixed,” and “insufficient information” should also be distinguished.
-A text can express no sentiment, express opposing sentiments, or lack enough
-context to determine the intended meaning. Collapsing them into neutral changes
-what the system measures.
-
-The unit of analysis also matters: a document, sentence, named target, and
-aspect/opinion tuple require different labels and metrics. A polarity classifier
-does not automatically provide a validated intensity score or subjectivity label.
+Likewise, **neutral**, **mixed**, and **insufficient information** describe
+different situations. Collapsing them changes the task. A more powerful model
+cannot compensate for an unclear label policy: models may disagree because they
+are answering different questions. Classical NLP is most defensible when its
+output matches a clear, stable measurement need.
 
 ## 3. Why is the problem difficult?
 
-The root difficulty is that sentiment is a relation between language, context,
-and a target. It is not an intrinsic property of individual words.
+**The root difficulty is that sentiment depends on meaning, context, and a
+target.** Individual words provide clues, but their polarity can change when
+combined with other words or interpreted in another domain. The examples below
+are constructed illustrations, not tested model outputs.
 
-The following examples are **constructed illustrations**, not benchmark items or
-tested model outputs:
-
-| Example | Underlying difficulty |
+| Example | Root cause of the difficulty |
 |---|---|
-| “The service was not good.” | Negation changes polarity; the scope matters |
-| “Great, another outage.” | Surface-positive words can express sarcasm |
-| “I waited forty minutes and nobody came.” | Negative sentiment is implied without an explicit sentiment adjective |
-| “A won the contract; B lost it.” | Sentiment depends on the target entity |
-| “The camera is excellent, but the battery is awful.” | Opposing sentiments belong to different aspects |
-| “Losses narrowed from $10 million to $2 million.” | A negative accounting term occurs in an improving situation |
-| “Profit increased, but missed the forecast.” | Absolute growth and performance relative to expectations differ |
-| “The CEO called the results ‘excellent’; analysts disagreed.” | Opinion holder and attribution matter |
+| “The service was not good.” | Negation changes the evaluation; its scope must be identified. |
+| “Great, another outage.” | Sarcasm creates a gap between literal wording and intended meaning. |
+| “I waited forty minutes and nobody came.” | The complaint is implied through an event rather than a sentiment adjective. |
+| “A won the contract; B lost it.” | The same event has different implications for different targets. |
+| “The camera is excellent, but the battery is awful.” | Different aspects carry conflicting evaluations. |
+| “Losses narrowed from $10 million to $2 million.” | A negative accounting term appears in an improving situation. |
+| “Profit increased, but missed the forecast.” | The evaluation depends on expectations as well as absolute change. |
+| “The CEO called the results ‘excellent’; analysts disagreed.” | Opinions must be assigned to the correct speakers. |
 
-**Composition and context.** Bag-of-words loses word order. Bigrams can learn
-“not good,” but cannot reliably represent arbitrary negation scope, quotation,
-long-distance dependencies, or discourse. Neural contextual representations help
-model these relationships, although learning them from data does not guarantee
-robustness. ([R03](https://aclanthology.org/P12-2018/), [R08](https://aclanthology.org/D13-1170/), [R10](https://aclanthology.org/N19-1423/), [R18](https://aclanthology.org/2020.acl-main.442/))
+**Context and composition.** Bag-of-words discards word order. Bigrams can learn
+“not good,” but do not capture arbitrary negation scope, quotations, or distant
+relationships. Contextual models learn richer representations, yet can still
+misread sarcasm or missing context. A target and horizon clarify a financial
+question; they do not supply economic facts absent from the text.
+([R03](https://aclanthology.org/P12-2018/), [R08](https://aclanthology.org/D13-1170/),
+[R10](https://aclanthology.org/N19-1423/), [R18](https://aclanthology.org/2020.acl-main.442/))
 
-**Domain dependence.** General sentiment dictionaries can assign inappropriate
-polarity to routine financial vocabulary. Loughran and McDonald found that
-almost three-fourths of the words flagged as negative by the Harvard dictionary
-in their 1994–2008 10-K sample were words normally not negative in financial
-contexts. This is a result about a particular dictionary and corpus, not the error
-rate of every dictionary or classifier. ([R36](https://doi.org/10.1111/j.1540-6261.2010.01625.x))
+**Domain dependence.** The meaning associated with vocabulary differs across
+applications. Loughran and McDonald found that almost three-fourths of the words
+flagged as negative by the Harvard dictionary in their 1994–2008 10-K sample
+were ordinarily not negative in financial usage. This concerns flagged words in
+one corpus, rather than a document-level error rate. It explains why a financial
+dictionary or domain-adapted model can be more appropriate than a generic one.
+([R36](https://doi.org/10.1111/j.1540-6261.2010.01625.x))
 
-**Distribution shift.** A model trained on product reviews may face financial
-news, a different language variety, new slang, or a changed class balance.
-Covariate shift concerns changes in inputs; label shift concerns class
-proportions; concept shift concerns changes in the input-to-label relationship.
-These can overlap. Changes in an annotation policy are another source of
-measurement instability. An increase in unfamiliar terms signals possible shift,
-but only labeled audits can establish whether predictive quality changed.
-([R25](https://aclanthology.org/2025.findings-acl.441/); evaluation synthesis)
+**Why drift happens—and why it is hard to detect.** A deployed model learns or
+uses patterns that may become less useful as the text, audience, or task changes:
 
-**Ambiguity in the labels themselves.** Annotators can disagree about sarcasm,
-mixed opinions, and economic implications. Financial PhraseBank includes subsets
-defined by annotator agreement. A model result on the unanimous subset is not
-directly comparable to one on the broader, more ambiguous subset. Annotator
-agreement describes reliability under an annotation design; it is not a strict
-mathematical ceiling on accuracy against adjudicated labels. ([R06](https://arxiv.org/abs/1307.5336), [R12](https://arxiv.org/abs/1908.10063))
+| What changes | Example | What it means for evaluation |
+|---|---|---|
+| Inputs | New slang, products, or language varieties | Familiar training patterns may no longer cover the workload. |
+| Class proportions | A real service outage creates more negative feedback | More negative predictions may reflect real events rather than worse predictions. |
+| Input-to-label relationship | A word gains a new meaning in the community | Previously useful associations can become misleading. |
 
-**Shortcut learning and coverage.** A model can exploit vocabulary associated
-with a class without learning the intended linguistic distinction. Aggregate
-accuracy may conceal failures on negation or a language variety. CheckList
-demonstrates why behavioral tests are useful alongside held-out benchmarks.
-([R18](https://aclanthology.org/2020.acl-main.442/), [R25](https://aclanthology.org/2025.findings-acl.441/))
+These changes can overlap. Changing the annotation policy is another source of
+instability. Monitoring vocabulary, predicted labels, or confidence can flag a
+possible change, but cannot by itself establish an increase in mistakes: current
+true labels are usually unavailable, and a model can remain confident while
+being wrong. Audit a representative, newly labeled sample and compare errors
+across classes and user groups. Drift can affect both classical models and LLMs;
+broad pretraining does not guarantee reliable adaptation.
+([R25](https://aclanthology.org/2025.findings-acl.441/); monitoring recommendations
+are evaluation synthesis.)
 
-**Unstated financial context.** A sentence about rising interest rates can have
-different implications for a borrower, a bank, a bondholder, and a currency.
-Providing a target and horizon improves task definition; it does not resolve
-missing economic facts. Sometimes abstention is the appropriate output.
+**Ambiguous labels and shortcuts.** Annotators can disagree about mixed opinions
+or sarcasm, so evaluation also depends on label reliability. Financial PhraseBank
+has subsets with different levels of annotator agreement; their results are not
+interchangeable. Agreement is informative, rather than a strict mathematical
+ceiling on accuracy against adjudicated labels. Models can also learn shortcuts,
+such as associating a brand with a sentiment class, that fail on new inputs.
+High aggregate accuracy may conceal these errors.
+([R06](https://arxiv.org/abs/1307.5336), [R12](https://arxiv.org/abs/1908.10063),
+[R18](https://aclanthology.org/2020.acl-main.442/))
+
+These difficulties explain the tradeoff: classical methods can be sufficient
+when validated lexical patterns match a stable task. Contextual classifiers or
+LLMs become more valuable when context-dependent errors matter. Every family
+still needs a clear task definition and checks on current, relevant examples.
 
 ## 4. Existing method families and how they work
 
@@ -185,7 +200,9 @@ does not resolve negation scope or target attribution.
 Lexicons work well when transparency, a stable textual measure, or minimal
 training resources matter. Their central limitation is coverage of context and
 composition. Updating a dictionary can also break comparability with historical
-measurements unless the version is fixed.
+measurements unless the version is fixed. For a task that explicitly measures
+word-based tone, a fixed lexicon can be a suitable output definition; richer
+company-specific interpretation requires separate validation.
 
 ### 4.2 Bag-of-words / TF-IDF with supervised classifiers
 
@@ -226,7 +243,9 @@ Routine preprocessing can destroy useful signals. Removing “not,” stripping
 emoji, or discarding punctuation can hurt sentiment analysis. Fit the vocabulary
 and IDF weights on the training set only. Use regularization and validation rather
 than assuming all stopwords should be removed. Character n-grams can help with
-spelling variation, but do not solve sarcasm or long-range context.
+spelling variation, but do not solve sarcasm or long-range context. This makes
+sparse models strong candidates for repeated, fixed-label tasks with useful
+training data, while complex contextual distinctions can justify another model.
 
 ### 4.3 Earlier neural models: CNNs and recurrent networks
 
@@ -289,6 +308,8 @@ limits can truncate relevant evidence in long documents. They can still fail on
 sarcasm, dialect variation, and unfamiliar language. Compression helps with
 compute demands, but domain shift and robustness still need evaluation.
 ([R10](https://aclanthology.org/N19-1423/), [R18](https://aclanthology.org/2020.acl-main.442/), [R25](https://aclanthology.org/2025.findings-acl.441/))
+For model selection, an encoder is worth testing when sparse features miss
+important context but the application still needs a fixed set of sentiment labels.
 
 ### 4.5 Prompted LLMs: zero-shot and few-shot classification
 
@@ -418,140 +439,149 @@ measured cost and latency, rather than model age or one published score.
 
 ## 6. Why classical methods can still be the right choice in 2026
 
-| Consideration | Classical / compact classifier advantage | When an LLM can justify its extra complexity |
+The strongest case for classical NLP is a **validated, stable task where its
+errors are acceptable and its operating advantages matter**. Convenience at
+setup and suitability at deployment are separate considerations.
+
+| Reason to choose classical NLP | Why the advantage can exist | When a richer model may be preferable |
 |---|---|---|
-| Prediction volume | Small per-example compute for repeated fixed-label tasks | Errors are costly enough that better measured quality outweighs inference cost |
-| Latency | Sparse linear inference avoids a large forward pass and answer generation | The application tolerates latency or benefits from richer extraction |
-| Local execution | CPU deployment can be straightforward | A suitable local LLM and serving setup fit the requirements |
-| Interpretability | Lexicon counts and linear feature contributions can be directly inspected | Validated evidence extraction or specialized mechanistic analysis adds value |
-| Reproducibility | Frozen preprocessing, weights, and software define a stable artifact | A pinned LLM, prompt, and serving configuration can be maintained and audited |
-| Annotation resources | Existing labels can make supervised training economical | Useful labels are scarce and the task can be described well |
-| Task flexibility | A fixed classification contract is easy to operate | New aspects, entities, or label rubrics change frequently |
-| Semantic complexity | Lexical patterns may be sufficient in a narrow domain | Context, paraphrase, or structured opinion extraction improves materially |
+| Low inference cost at high volume | Sparse classifiers score active features; lexicons apply small rule sets. | Better contextual predictions reduce sufficiently important errors. |
+| Predictable latency | Small local models avoid large-model inference and generated explanations. | The application tolerates the measured delay for useful extra capability. |
+| Inspectable decisions | Dictionary matches and linear feature contributions can be examined directly. | Contextual interpretation is essential and explanations can be validated appropriately. |
+| Consistent measurements | Frozen dictionaries, preprocessing, and weights define a stable artifact. | The measurement requires flexible aspects, targets, or changing schemas. |
+| Existing training labels | Supervised fitting can reuse representative labeled examples. | Labels are scarce and a prompted model performs well with limited demonstrations. |
+| Simple local deployment | Many classical models operate on ordinary CPUs with modest memory needs. | A local encoder or LLM fits the resources and provides valuable improvements. |
 
-These are conditional engineering expectations. There is no measured “100 times
-cheaper” or fixed latency ratio in this review. Hardware, document length,
-batching, quantization, caching, serving overhead, and model size can change the
-comparison. An open-weight LLM has compute and operational costs even without
-per-token API charges.
-
-The voluntary NIST AI Risk Management Framework provides a useful broader
-objective: validity/reliability, transparency, explainability, privacy, and
-fairness must be assessed in context. It does not recommend a particular model
-family. Inspectable lexical features can aid debugging, but a transparent model
-can still learn biased labels; local execution is available to both small
-classifiers and suitably hosted LLMs. These properties belong to the deployed
-system rather than following automatically from a model-family name.
+These are engineering expectations, rather than measured universal speed or cost
+ratios. FinBERT and compressed encoders may also meet deployment constraints.
+LLMs can run locally; privacy and reproducibility depend on the actual system.
+A transparent model can still learn biased or spurious associations. NIST's
+voluntary framework likewise treats reliability, explainability, privacy, and
+fairness as contextual requirements.
 ([R41](https://airc.nist.gov/airmf-resources/airmf/3-sec-characteristics/))
 
-Evaluate **total cost**, not only the bill for predictions:
+**The cost advantage depends on the workload.** Training a sparse classifier
+requires labels and development effort, which can be spread over many repeated
+predictions. An LLM can reduce that initial adaptation work, but each request
+still consumes compute; examples, context, explanations, and retries also add
+tokens or processing. Count the complete lifecycle:
 
 `total cost = labeling + development + training + inference + monitoring + error handling`
 
-For an API model, a simplified inference estimate is:
+Measure actual hardware or API cost, document length, batching, and request
+latency. Open-weight models and CPU baselines both have operating costs. There
+is no justified break-even traffic volume until those quantities are measured.
 
-`N × ((input_tokens × input_rate + output_tokens × output_rate) / 1,000,000)`
+**Reliability requires maintenance in every family.** Pin model, software, and
+prompt versions, test repeated outputs, and audit drift. Low decoding temperature
+does not universally guarantee identical LLM responses. A stable artifact makes
+comparison easier, but cannot prevent changes in the language it receives.
 
-Here rates are dollars per million tokens. As a **hypothetical arithmetic example**,
-one million texts averaging 200 input tokens and 10 output tokens, at invented
-rates of $1/million input tokens and $5/million output tokens, cost **$250** in
-token charges. These are not provider prices. The example omits retries, cached
-pricing, longer prompts, overhead, and error costs. Classical serving also has
-costs and needs measurement. It would be invalid to compare $250 to an assumed
-zero-cost CPU system.
+## 7. Where classical methods remain useful in practice
 
-For reliability, record model and prompt versions and test repeated predictions.
-Low or zero decoding temperature does not universally guarantee identical
-outputs. A fixed small classifier is easier to freeze, but it can still have
-software/version differences and still needs drift monitoring.
+Applications help answer the research question by showing which properties
+matter. The following selection arguments are based on the methods and cited
+studies; they are not locally measured deployment outcomes.
 
-## 7. Why this matters in finance and industry
+**Repeated feedback classification.** A team processing many short comments
+under fixed positive/negative/neutral labels may already have useful training
+examples. TF-IDF + a linear classifier is a credible candidate if it meets the
+required quality and response time. The practical question is whether a richer
+model reduces important missed complaints enough to justify its additional
+cost. Strong classical baseline design matters to this comparison.
+([R03](https://aclanthology.org/P12-2018/))
 
-**Finance: scalable measurement.** Earnings calls, filings, analyst reports,
-news, and investor posts contain information that cannot be manually reviewed
-at scale. Sentiment systems can support research triage, risk monitoring,
-document comparison, and entity-specific news analytics. Financial sentiment
-benchmarks explicitly include microblogs and news. ([R23](https://aclanthology.org/S17-2089/))
+**Consistent financial-tone measurement.** If the goal is to count negative or
+uncertain financial language consistently across filings, a fixed
+Loughran–McDonald dictionary can provide an inspectable measure. Domain vocabulary
+matters: uncertainty and negative tone are distinct categories. A task asking
+which company benefits from an event requires additional contextual interpretation
+and a separate evaluation.
+([R05](https://sraf.nd.edu/loughranmcdonald-master-dictionary/),
+[R36](https://doi.org/10.1111/j.1540-6261.2010.01625.x))
 
-**Finance: domain validity.** The Loughran–McDonald result shows why using a
-generic word list can measure the wrong thing. A rise in uncertain language is
-different from worsening earnings. A claim about positive tone is different from
-a claim about positive future returns. ([R05](https://sraf.nd.edu/loughranmcdonald-master-dictionary/), [R36](https://doi.org/10.1111/j.1540-6261.2010.01625.x))
+**When richer analysis earns its cost.** News about multiple companies and
+feedback about several aspects may require preserving conflicting evaluations.
+Financial sentiment benchmarks and the target-specific study in section 5
+illustrate these tasks. The Dutch employee-survey study also shows why salary,
+scheduling, and communication can need separate labels. Target-aware classifiers
+or LLMs deserve consideration when these distinctions materially improve the
+useful output; a single cheap label can discard what the application needs.
+([R23](https://aclanthology.org/S17-2089/),
+[R40](https://link.springer.com/article/10.1007/s41060-026-01201-x),
+[R42](https://aclanthology.org/2024.nlp4hr-1.2/))
 
-**Finance: sentiment is not trading performance.** Tetlock reports relationships
-between media pessimism, market prices, and trading volume in a historical
-setting. This motivates research, but neither that result nor accurate sentiment
-classification proves a profitable contemporary strategy. ([R37](https://doi.org/10.1111/j.1540-6261.2007.01232.x))
+**A downstream benefit needs its own evidence.** Sentiment and stock returns
+can move together because the same earnings surprise influences both, or because
+price movements shape subsequent news language. This makes correlation alone
+insufficient to establish causation or future-return prediction. Historical
+associations motivate research, but better sentiment accuracy does not establish
+trading profitability. An expensive model is justified by demonstrated value for
+the intended decision, not by assuming a sentiment score causes that value.
+([R37](https://doi.org/10.1111/j.1540-6261.2007.01232.x))
 
-A trading study must separately consider public-information timing, market
-expectations, horizon, transaction costs, liquidity, survivorship bias, and
-out-of-sample performance. Historical LLM backtests need special care if model
-training postdates the events: later factual knowledge can contaminate a
-historical decision simulation. Restricting supplied context helps, but does not
-prove absence of memorized future information.
+## 8. How to decide whether an LLM is worth the additional cost
 
-**Industry: operational decisions.** Customer support can route complaints;
-product teams can aggregate aspect-specific feedback; organizations can monitor
-reputation. An overall sentiment average may conceal a payment failure affecting
-a minority of users. False alarms, missed urgent complaints, and unequal errors
-across customer language varieties are consequential deployment outcomes.
+The comparison should establish whether additional model capability produces
+useful gains under the application's requirements. The detailed protocol is in
+[Experiments](EXPERIMENTS.md); the decision rests on four checks:
 
-Open-ended employee surveys provide another application. Rink et al. study
-aspect-based sentiment in 1,458 Dutch survey responses, including salary,
-scheduling, communication, and personal attention. A whole-response label can
-conceal opposing evaluations of these aspects. The study is an application
-example for contextual classifiers, not evidence that prompted generative LLMs
-always outperform other methods on surveys.
-([R42](https://aclanthology.org/2024.nlp4hr-1.2/))
+1. **Compare the same task.** Give models the same permitted context, targets,
+   labels, and test items. Include a strong sparse baseline, an appropriate
+   contextual classifier, and a prompted LLM. State which training labels and
+   prompt examples each receives; full-label and limited-label settings answer
+   different questions.
+2. **Find the errors that matter.** Report per-class mistakes and macro F1,
+   which balances precision and recall across classes. Check negation, mixed
+   targets, implied sentiment, and relevant language varieties. When mistakes
+   have different consequences, evaluate those consequences alongside scores.
+3. **Measure the full operating tradeoff.** Include labeling, adaptation,
+   inference, retries, monitoring, and human review. Measure latency and
+   throughput on the intended workload. A gain in average accuracy may have
+   little value if it misses urgent complaints or exceeds the response-time
+   requirement.
+4. **Check that the result survives new data.** Reserve untouched test examples;
+   keep test labels out of feature fitting, tuning, and prompt selection. Audit
+   possible pretrained-model exposure to the benchmark, and test a recent or
+   shifted-domain sample. Report uncertainty, since a small observed score
+   difference may be sampling noise.
 
-## 8. How to compare the methods fairly
+If confidence controls escalation to an LLM or a person, validate it on held-out
+labels. An SVM margin or a model's verbal “95% confidence” is not an established
+probability of correctness, and confidence can become unreliable under drift.
+([R19](https://arxiv.org/abs/1706.04599))
 
-The [evaluation protocol](EXPERIMENTS.md) provides the complete design.
-Its essential principles are:
-
-1. Define the same targets, labels, context, and abstention policy for every model.
-2. Compare a lexicon, strong sparse linear baselines, a contextual classifier,
-   and prompted LLMs on identical test examples.
-3. Separate full-label, limited-label, and cross-domain comparisons. They answer
-   different questions and have different resource budgets.
-4. Keep the test set out of vectorizer fitting, prompt selection, example
-   retrieval, calibration, and hyperparameter tuning.
-5. Report macro F1, per-class errors, uncertainty, and behavioral slices alongside
-   accuracy. Use extraction metrics for extraction tasks rather than reusing
-   classification accuracy.
-6. Measure cost, throughput, end-to-end latency, output validity, and repeatability.
-7. Evaluate a recent or shifted-domain holdout before making deployment claims.
-
-Confidence is another measurement problem. A softmax output can be
-miscalibrated; an SVM margin is not a probability; an LLM's self-reported
-“95% confidence” is not validated calibration. If confidence controls escalation,
-fit and assess calibration on appropriate held-out data and measure performance
-at each coverage level. ([R19](https://arxiv.org/abs/1706.04599))
+Choose classical NLP when it meets the necessary quality and operating
+requirements at lower measured total cost. Choose a contextual model, LLM, or
+hybrid when it delivers enough additional value to justify its costs. Successful
+classification in one prompt is a starting point; evidence from this comparison
+is what supports a deployment decision.
 
 ## 9. Research conclusions and open questions
 
-The evidence supports choosing the **smallest system that satisfies a validated
-quality and operational requirement**, while preserving an escalation path for
-cases it cannot handle. That recommendation is synthesis, not a theorem that
-smaller models always win.
+**Classical sentiment analysis remains relevant because a stable, clearly
+defined task can reward efficient computation, inspectable decisions, and
+repeatable measurements.** These advantages matter only when the method measures
+the intended sentiment and handles important errors adequately. They do not
+make classical NLP universally more accurate or easier to maintain.
 
-Classical NLP remains useful because stable tasks can reward efficiency,
-inspectable decision rules, local control, and repeatable measurements. LLMs are
-useful because broad pretraining and instructions can reduce dependence on
-task-specific labels and support richer analysis. Fine-tuned encoders, SetFit,
-and hybrid systems are essential alternatives in that decision.
+LLMs are attractive when instructions and broad contextual knowledge help with
+scarce labels or richer outputs. Fine-tuned and compact transformer classifiers
+provide another option. All families face ambiguous labels, domain-dependent
+meaning, and changing data, so selecting a capable model is only part of building
+a reliable sentiment system.
 
-The most valuable unanswered questions for a concrete project are:
+The remaining questions require measurements on the intended data:
 
-- How much does a current prompted LLM improve over a well-tuned FinBERT or
-  sparse linear baseline on recent, entity-specific financial text?
-- Which error slices account for that improvement: negation, implied sentiment,
-  expectations, mixed aspects, dialect, or attribution?
-- At what traffic volume and error cost does one system become preferable?
-- Does the improvement survive domain shift and new annotation rules?
-- Can a validated cascade capture most of the benefit at lower total cost?
+- Which contextual errors does a current LLM reduce compared with a strong sparse
+  classifier and a suitable financial encoder?
+- How do available labels, prediction volume, and the consequences of mistakes
+  change the total-cost comparison?
+- Do the benefits survive recent text, domain changes, and different user groups?
+- Can selective escalation preserve useful gains while reducing operating cost?
 
-Answering those questions requires a controlled evaluation on the intended data.
-This review establishes methods and evidence for that design. The accompanying
-[code and execution records](EXPERIMENTS.md) demonstrate implementation progress;
-constructed-fixture scores do not answer those research questions.
+The literature supports this decision framework rather than a universal 2026
+ranking. The [implemented code and example checks](EXPERIMENTS.md) demonstrate
+progress, but representative-data benchmarking and LLM execution remain pending.
+The answer for a deployment must come from a clear task, trustworthy evaluation,
+and measured quality and operating requirements.
