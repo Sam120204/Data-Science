@@ -350,6 +350,20 @@ These are design options, not locally verified findings.
 The studies suggest several useful patterns. Their results depend on the task,
 training data, and model version, so they do not establish one universal winner.
 
+The papers supporting this section are listed below. Full titles, author lists,
+and available PDF links are in [References](REFERENCES.md).
+
+| Paper | What it contributes |
+|---|---|
+| [Wang & Manning (2012; R03)](https://aclanthology.org/P12-2018/) | Shows why carefully built classical baselines deserve consideration. |
+| [Araci (2019; R12)](https://arxiv.org/abs/1908.10063) | Evaluates FinBERT for financial sentiment classification. |
+| [Zhang et al. (2024; R13)](https://aclanthology.org/2024.findings-naacl.246/) | Finds that LLM performance depends on the task and available labels; uses older models. |
+| [Srirag et al. (2025; R25)](https://aclanthology.org/2025.findings-acl.441/) | Examines sentiment and sarcasm across English varieties. |
+| [Teles & Figueiredo (2025; R26)](https://arxiv.org/abs/2510.15929) | Compares financial sentiment models across datasets; baseline and label-description limitations require caution. |
+| [Li et al. (2026; R27)](https://aclanthology.org/2026.acl-long.928/) | Investigates why different prompts can elicit different sentiment predictions. |
+| [Rahul & Adebayo (2026; R35)](https://aclanthology.org/2026.dravidianlangtech-1.2/) | Shows weaker performance on difficult examples in a small Hinglish robustness study. |
+| [Muhammad et al. (2026; R40)](https://link.springer.com/article/10.1007/s41060-026-01201-x) | Reports strong LLM results for company-specific financial sentiment, with limited coverage and comparison issues. |
+
 **Classical methods remain serious baselines.** Wang and Manning showed that
 simple word-based classifiers can perform strongly when their features and
 training are chosen carefully. This supports comparing LLMs against a well-built
@@ -392,6 +406,9 @@ varieties and prompt sensitivity shows that language differences and instruction
 wording can change results. Test the language, domain, and inputs the system
 will actually face. ([R25](https://aclanthology.org/2025.findings-acl.441/),
 [R27](https://aclanthology.org/2026.acl-long.928/))
+A small Hinglish study also found weaker performance on difficult examples,
+supporting the need to check robustness beyond ordinary benchmark scores.
+([R35](https://aclanthology.org/2026.dravidianlangtech-1.2/))
 
 The conclusion is that classical models, fine-tuned transformers, and prompted
 LLMs all deserve consideration. Classical models remain useful when efficiency
