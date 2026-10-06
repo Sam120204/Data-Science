@@ -41,10 +41,10 @@ Here, **classical NLP** includes lexicons/rules such as VADER and sparse
 classifiers such as TF-IDF + logistic regression. **Fine-tuned transformer
 classifiers**, including FinBERT, form a separate contextual alternative.
 **Prompted LLMs** interpret instructions and generate labels or richer outputs.
-Compact encoders, SetFit, and hybrid systems make the choice broader than a
-simple classical-versus-LLM contest.
+Contextual classifiers provide supporting comparisons between sparse features
+and prompted generative models.
 ([R10](https://aclanthology.org/N19-1423/), [R11](https://arxiv.org/abs/1910.01108),
-[R12](https://arxiv.org/abs/1908.10063), [R15](https://arxiv.org/abs/2209.11055))
+[R12](https://arxiv.org/abs/1908.10063))
 
 **“One prompt” reduces the work needed to start classification.** It does not
 establish that the labels measure the intended concept, that predictions remain
@@ -174,13 +174,13 @@ research question are:
 | Group | Methods covered in this section |
 |---|---|
 | **Classical NLP** | Lexicons/rules in **4.1** and bag-of-words/TF-IDF classifiers in **4.2** |
-| **LLMs** | Prompted generative models in **4.5** and task-adapted generative models in **4.6** |
+| **LLMs** | Zero-shot and few-shot prompted generative models in **4.5** |
 
 Sections **4.3–4.4** explain neural classifiers as supporting comparisons:
 FinBERT, for example, predicts fixed labels rather than generating a prompted
-answer. Section **4.6** also covers encoder-based SetFit and hybrid pipelines.
-These alternatives help assess whether a prompted LLM is necessary without
-grouping every neural model into the LLM category. All the methods belong to NLP.
+answer. These supporting comparisons help assess whether a prompted LLM is
+necessary without grouping every neural model into the LLM category. All the
+methods belong to NLP.
 
 ### 4.1 Rules and sentiment lexicons
 
@@ -355,30 +355,6 @@ computation. The 2026 circuit-analysis paper investigates Gemma-2-2B and Llama-3
 across seven datasets, using available sparse autoencoders and binary-filtered
 transfer data. It studies internal mechanisms and interventions; that is a different form of evidence from a prose rationale.
 ([R27](https://aclanthology.org/2026.acl-long.928/))
-
-### 4.6 Task-adapted LLMs, SetFit, distillation, and hybrids
-
-**Task-adapted generative models** can be fine-tuned on financial instructions
-and labels. Parameter-efficient methods such as LoRA update a small additional
-set of parameters while keeping most original weights fixed. This changes the
-tradeoff: the system is no longer only a general-purpose model used in one prompt.
-Financial adaptation research and FinGPT illustrate this direction. ([R22](https://arxiv.org/abs/2306.06031), [R24](https://arxiv.org/abs/2401.14777))
-
-**SetFit** fine-tunes a pretrained sentence transformer using contrastive text
-pairs constructed from a small labeled set, then trains a classification head on
-the resulting embeddings. It demonstrates that scarce labels do not force a
-choice between a weak sparse classifier and a large prompted model. ([R15](https://arxiv.org/abs/2209.11055), [R32](https://github.com/huggingface/setfit))
-
-**LLM-assisted labeling and distillation** use a larger model to generate candidate
-labels or supervision for a smaller deployment model. Human checks remain
-necessary: training on incorrect synthetic labels can reproduce teacher errors.
-
-**A cascade** can route easy examples to a small classifier, ambiguous cases to
-an LLM, and unresolved cases to people. Routing might use calibrated scores,
-disagreement, an out-of-domain check, or task-specific rules. The combined
-system must be evaluated: the LLM receives a deliberately difficult subset,
-so its overall benchmark score will not predict its performance on routed cases.
-These are design options, not locally verified findings.
 
 ## 5. What the comparative literature supports
 
@@ -566,8 +542,8 @@ probability of correctness, and confidence can become unreliable under drift.
 ([R19](https://arxiv.org/abs/1706.04599))
 
 Choose classical NLP when it meets the necessary quality and operating
-requirements at lower measured total cost. Choose a contextual model, LLM, or
-hybrid when it delivers enough additional value to justify its costs. Successful
+requirements at lower measured total cost. Choose a contextual classifier or LLM
+when it delivers enough additional value to justify its costs. Successful
 classification in one prompt is a starting point; evidence from this comparison
 is what supports a deployment decision.
 
@@ -592,7 +568,6 @@ The remaining questions require measurements on the intended data:
 - How do available labels, prediction volume, and the consequences of mistakes
   change the total-cost comparison?
 - Do the benefits survive recent text, domain changes, and different user groups?
-- Can selective escalation preserve useful gains while reducing operating cost?
 
 The literature supports this decision framework rather than a universal 2026
 ranking. The [implemented code and example checks](EXPERIMENTS.md) demonstrate
