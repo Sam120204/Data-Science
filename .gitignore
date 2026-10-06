@@ -9,5 +9,5 @@ __pycache__/
 *.py[cod]
 .venv/
 
-# Ad hoc experiment runs; curated smoke records are versioned separately
-research/sentiment-analysis/results/local/
+# Generated local experiment outputs
+research/code/runs/

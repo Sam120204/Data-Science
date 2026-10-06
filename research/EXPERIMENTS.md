@@ -11,14 +11,41 @@ regression, TF-IDF + LinearSVC, majority-class prediction, and VADER. A pinned
 FinBERT inference adapter and an imported-prediction scorer support future
 comparisons. The FinBERT adapter has not been executed with model weights.
 
-The [smoke-run records](results/smoke/README.md) contain actual outputs on
-18 constructed training items and nine constructed test items. These examples
-check execution and output structure; their scores do not establish generalization,
-financial-domain performance, or a ranking between model families.
+## Executed checks
 
-The current code implements fixed, whole-text, three-class polarity. Target-aware
-extraction, hyperparameter search, calibration, confidence intervals, dialect
-slices, and production latency/cost measurement remain evaluation work.
+Five local runs were completed on **6 October 2026** using Python 3.12,
+scikit-learn 1.5.2, NumPy 1.26.4, and vaderSentiment 3.3.2. They used the
+[example CSVs](code/examples/train.csv) with 18 training rows and
+[nine test rows](code/examples/test.csv), balanced across three labels.
+
+**These are constructed examples, not a research benchmark.** Sentences are
+simple, vocabulary overlaps, and labels were authored rather than independently
+annotated. The scores check code execution and cannot establish performance on
+natural financial text or a ranking of model families.
+
+| Execution | Accuracy | Macro F1 |
+|---|---:|---:|
+| majority | 0.3333 | 0.1667 |
+| logreg-word | 1.0000 | 1.0000 |
+| linearsvc-word | 1.0000 | 1.0000 |
+| linearsvc-char | 1.0000 | 1.0000 |
+| vader | 1.0000 | 1.0000 |
+
+Macro F1 includes all three classes; undefined values use zero. The majority
+baseline resolves the balanced-training tie as negative. VADER uses its standard
+compound-score thresholds without fitting on labels.
+
+The 12 automated checks cover malformed inputs, duplicate and overlapping
+examples, group separation, training-only vocabulary, metric ordering, imported
+prediction alignment, checkpoint revisions, and output preservation. Commands
+to reproduce the runs and checks are in the [code guide](code/README.md).
+
+## Remaining experimental work
+
+Representative-data benchmarking, development-set tuning, FinBERT weight
+execution, LLM inference, target-aware extraction, calibration, confidence
+intervals, dialect slices, and production latency/cost measurement remain
+pending. The current code implements whole-text, three-class polarity.
 
 ## Evaluation design
 

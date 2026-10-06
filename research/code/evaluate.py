@@ -10,7 +10,7 @@ from pathlib import Path
 
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, f1_score
 
-from .data import LABELS, file_hash
+from data import LABELS, file_hash
 
 
 def metrics(examples, predictions):

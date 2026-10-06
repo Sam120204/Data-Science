@@ -2,7 +2,7 @@
 
 from collections import Counter
 
-from .data import LABELS
+from data import LABELS
 
 
 def sparse_pipeline(model, features, seed):

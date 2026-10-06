@@ -7,9 +7,9 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
-from sentiment.data import Example, check_splits, read_examples, read_predictions
-from sentiment.evaluate import metrics, write_run
-from sentiment.models import FinBert, sparse_pipeline
+from data import Example, check_splits, read_examples, read_predictions
+from evaluate import metrics, write_run
+from models import FinBert, sparse_pipeline
 
 
 class PipelineTests(unittest.TestCase):

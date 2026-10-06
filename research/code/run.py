@@ -2,9 +2,9 @@ import argparse
 from pathlib import Path
 from time import perf_counter
 
-from .data import check_splits, read_examples, read_predictions
-from .evaluate import write_run
-from .models import FinBert, Majority, Vader, sparse_pipeline
+from data import check_splits, read_examples, read_predictions
+from evaluate import write_run
+from models import FinBert, Majority, Vader, sparse_pipeline
 
 
 def main():

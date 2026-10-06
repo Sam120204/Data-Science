@@ -1,8 +1,7 @@
 # Annotated papers and primary resources
 
-Research/access date: **6 October 2026**. Bibliographic metadata and review depth
-are recorded in [Source catalog](sources/verified-sources.json).
-The BibTeX file is [BibTeX bibliography](sources/references.bib).
+Research/access date: **6 October 2026**. Entries include authors, publication
+dates, primary paper links, available PDFs, and review notes.
 
 Suggested starting papers: **R03, R12, R13, R25, R27, and R40**.
 Findings and qualifications are integrated in [Research](RESEARCH.md).
@@ -294,7 +293,7 @@ BESSTIE evaluates sentiment and sarcasm across Australian, Indian, and British E
 
 Financial comparison across several datasets, with both generative and encoder models. Useful as a critical-reading case: mixed taxonomy, omitted strong linear baselines, and a label-description inconsistency.
 
-**Review note:** 2025 preprint; methods/results inspected; use cautiously, as discussed in the integrated research and evidence audit notes.
+**Review note:** 2025 preprint; methods/results inspected; use cautiously, as discussed in the research.
 
 <a id="r27"></a>
 ## R27: Uncovering Sentiment Analysis Circuit in Large Language Model
@@ -406,9 +405,7 @@ Aspect-based sentiment application using 1,458 Dutch HR survey responses and Dut
 
 These upstream projects provide methods, checkpoints, and datasets. The local
 [code](code/README.md) uses scikit-learn and vaderSentiment; full upstream
-repositories have not been vendored or reproduced. Checked repository commits and
-GitHub-reported licenses are in
-[Repository revisions](sources/repository-snapshots.json).
+repositories have not been vendored or reproduced.
 License metadata is not a substitute for reviewing the terms of any separate
 model weights, corpus, or downloaded asset.
 
@@ -432,3 +429,17 @@ revisions. Start with the strong TF-IDF baseline and one contextual classifier,
 then add a prompted LLM under the same labels and input context. The
 [evaluation protocol](EXPERIMENTS.md) describes how to avoid misleading
 comparisons.
+
+## Review scope
+
+This is a targeted literature review. Methods/results/limitations were inspected
+in eight PDFs (R03, R12, R13, R24, R25, R26, R27, R35), the publisher HTML for
+R40, and the official framework section for R41. Other entries were reviewed
+through abstracts, bibliographic metadata, documentation, or model/repository
+cards. R36 and R37 were checked through publisher-supplied metadata rather than
+the full journal articles. Published experiments have not been reproduced here.
+
+The contributed draft included numbered citations without a bibliography. Its
+unidentified survey, Nigerian-tweet, review, and edge-AI studies were not used
+as verified empirical evidence. Independently identified sources support the
+findings included in [Research](RESEARCH.md).
