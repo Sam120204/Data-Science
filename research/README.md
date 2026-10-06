@@ -41,5 +41,3 @@ research/
 ├── REFERENCES.md      # Papers and resource links
 └── code/              # Baselines, checks, and two example CSVs
 ```
-
-Last updated: **6 October 2026**.

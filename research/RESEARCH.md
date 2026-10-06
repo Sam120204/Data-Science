@@ -1,6 +1,6 @@
 # Sentiment analysis: classical NLP, transformers, and LLMs
 
-Research date: **6 October 2026**. This synthesis combines the reviewed literature
+This synthesis combines the reviewed literature
 and contributed research by subject. Paper links accompany findings; complete
 citations and PDF links appear in [References](REFERENCES.md). Published scores
 are attributed to their original settings and have not been reproduced here.

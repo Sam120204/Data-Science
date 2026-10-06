@@ -13,7 +13,7 @@ comparisons. The FinBERT adapter has not been executed with model weights.
 
 ## Executed checks
 
-Five local runs were completed on **6 October 2026** using Python 3.12,
+Five local runs were completed using Python 3.12,
 scikit-learn 1.5.2, NumPy 1.26.4, and vaderSentiment 3.3.2. They used the
 [example CSVs](code/examples/train.csv) with 18 training rows and
 [nine test rows](code/examples/test.csv), balanced across three labels.

@@ -1,6 +1,6 @@
 # Annotated papers and primary resources
 
-Research/access date: **6 October 2026**. Entries include authors, publication
+Entries include authors, publication
 dates, primary paper links, available PDFs, and review notes.
 
 Suggested starting papers: **R03, R12, R13, R25, R27, and R40**.
