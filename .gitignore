@@ -1,0 +1,10 @@
+# Operating-system metadata
+.DS_Store
+
+# Microsoft Office temporary lock files
+~$*
+
+# Local Python caches and environments
+__pycache__/
+*.py[cod]
+.venv/

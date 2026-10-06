@@ -1,0 +1,7 @@
+# Markdown uses trailing spaces for intentional line breaks.
+*.md text eol=lf whitespace=-blank-at-eol
+
+# Keep machine-readable research files consistent across platforms.
+*.csv text eol=lf
+*.json text eol=lf
+*.bib text eol=lf
