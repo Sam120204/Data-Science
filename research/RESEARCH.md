@@ -168,6 +168,25 @@ still needs a clear task definition and checks on current, relevant examples.
 
 ## 4. Existing method families and how they work
 
+**All these methods belong to NLP; LLMs are one type of NLP model.** For this
+research question, the useful distinction is between classical methods,
+neural classifiers, and generative LLMs used through prompting or adaptation.
+
+| Section and methods | Category used in this review |
+|---|---|
+| **4.1:** VADER, financial dictionaries, SentiWordNet | Classical NLP: lexicons and rules |
+| **4.2:** Bag-of-words/TF-IDF + Naive Bayes, logistic regression, SVM | Classical NLP: statistical classifiers |
+| **4.3:** CNNs, RNNs/LSTMs, recursive models | Earlier neural NLP |
+| **4.4:** BERT, FinBERT, DistilBERT, TinyBERT classifiers | Contextual transformer classifiers |
+| **4.5:** Zero-shot and few-shot prompting | Prompted generative LLMs |
+| **4.6:** Adapted LLMs, SetFit, distillation, cascades | Mixed approaches: LLM adaptation, encoder training, or combinations of models |
+
+Transformer classifiers learn contextual representations and predict fixed
+labels; prompted LLMs generate an answer from instructions. Both use neural
+models, but their deployment and training requirements differ. In section 4.6,
+SetFit is encoder-based, while labeling, distillation, and cascades can combine
+larger models with smaller classifiers.
+
 ### 4.1 Rules and sentiment lexicons
 
 A lexicon assigns sentiment values or categories to words. A basic system
