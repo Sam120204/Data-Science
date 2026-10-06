@@ -280,10 +280,15 @@ capability, and 60% faster operation. These are historical, configuration-specif
 results, not guaranteed sentiment accuracy or speed on current hardware.
 ([R39](https://aclanthology.org/2020.findings-emnlp.372/), [R11](https://arxiv.org/abs/1910.01108))
 
-Transformer classifiers can outperform lexical approaches when contextual
-distinctions matter, but require representative task labels and appropriate
-evaluation. Pretraining is not a guarantee against dialect bias, domain shift,
-or brittle behavior on targeted linguistic tests. ([R18](https://aclanthology.org/2020.acl-main.442/), [R25](https://aclanthology.org/2025.findings-acl.441/), [R35](https://aclanthology.org/2026.dravidianlangtech-1.2/))
+**Main limitations:** Fine-tuning needs representative labeled examples; a model
+trained on reviews can misread financial news, and changing domains or label
+definitions may require new labels and retraining. Compared with VADER or sparse
+linear models, transformer classifiers usually need more memory and inference
+compute, and their individual decisions are harder to explain. Input-length
+limits can truncate relevant evidence in long documents. They can still fail on
+sarcasm, dialect variation, and unfamiliar language. Compression helps with
+compute demands, but domain shift and robustness still need evaluation.
+([R10](https://aclanthology.org/N19-1423/), [R18](https://aclanthology.org/2020.acl-main.442/), [R25](https://aclanthology.org/2025.findings-acl.441/))
 
 ### 4.5 Prompted LLMs: zero-shot and few-shot classification
 
