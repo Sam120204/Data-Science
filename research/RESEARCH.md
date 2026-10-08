@@ -232,64 +232,95 @@ company-specific interpretation requires separate validation.
 
 ### 4.2 Bag-of-words / TF-IDF with supervised classifiers
 
-The pipeline is:
+These methods learn from texts that already have sentiment labels. This is
+**supervised learning**: the training examples show the model which patterns
+are associated with positive, negative, or neutral sentiment.
 
-1. Tokenize text into words, word n-grams, or character n-grams.
-2. Convert each document into a sparse feature vector.
-3. Learn the relationship between those features and labeled examples.
-4. Apply the same transformation and classifier to new text.
+The process has two parts: **turn words into numbers**, then **learn how those
+numbers relate to sentiment**.
 
-**Bag-of-words** is a representation: it records counts or presence of tokens.
-**TF-IDF** is a weighting scheme, not a classifier. It upweights terms frequent
-in a document and downweights terms widespread across the training corpus.
-One common smoothed inverse-document-frequency definition is
-`idf(t) = log((1 + N)/(1 + df(t))) + 1`; normalization and term-frequency choices
-vary by implementation. ([R28](https://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction))
+- **Bag-of-words:** Record which words appear and how often, without preserving
+  their order. “Good service” and “service good” have the same word counts.
+- **TF-IDF (term frequency–inverse document frequency):** Give words weights
+  based on how often they appear in a text and how common they are across the
+  training collection. Words that help distinguish texts receive more weight
+  than words appearing almost everywhere. A high TF-IDF weight does not itself
+  mean a word is positive or negative.
+- **Classifier:** A model that learns to map these counts or weights to a
+  sentiment label. TF-IDF prepares the input; the classifier makes the prediction.
+  ([R28](https://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction))
 
-Common classifiers include:
+For example, a classifier may learn that “excellent” often appears in positive
+reviews and “broken” in negative ones. Single-word counts have difficulty with
+“not good.” Adding **bigrams**, meaning pairs of consecutive words, lets the
+model learn “not good” as a separate pattern. It still needs suitable examples
+and does not automatically understand every form of negation.
 
-| Classifier | Mechanism | Useful property | Limitation |
-|---|---|---|---|
-| Multinomial Naive Bayes | Combine class priors and token likelihoods under a conditional-independence assumption | Fast training and inference; useful text baseline | Feature independence is unrealistic; confidence can be poor |
-| Logistic regression | Learn a weighted sum of features; transform logits to class probabilities | Regularized, efficient; direct feature contributions | Sparse features have limited semantic generalization; probabilities still need validation |
-| Linear SVM | Learn a separating boundary with a large margin | Strong sparse-text baseline | Decision scores are not calibrated probabilities |
-| NB-SVM | Reweight features using Naive Bayes log-count ratios, then train a linear SVM | A strong, simple sentiment baseline | Still depends on observed lexical features |
-| Tree ensembles | Combine decision trees over input features | Can mix text-derived and structured variables | Often a weaker default for very high-dimensional sparse text than linear methods |
+| Classifier | Plain-language explanation | Main limitation for sentiment |
+|---|---|---|
+| Naive Bayes | Uses how often words occur in each sentiment class to estimate the likely label. | Treats word contributions as independent, missing how words change each other's meaning. |
+| Logistic regression | Learns how much each word or phrase should push the prediction toward each label. | Depends on learned text patterns; unfamiliar wording and context can be difficult. |
+| Linear SVM | Learns a scoring rule that separates texts with different sentiment labels. | Its decision score is not automatically a reliable probability of being correct. |
+| NB-SVM | Combines Naive Bayes word weights with an SVM classifier. | Still relies on observed words and phrases rather than broad contextual understanding. |
+| Tree ensembles | Combine many decision trees, each making a series of checks on the input. | Large word lists can be difficult for them; linear classifiers are often a stronger starting point for text. |
 
-For a linear classifier, `score = b + sum_j w_j x_j`. The term `w_j x_j`
-gives the feature's contribution to that model score. This makes the decision
-inspectable; it does not prove the word causes the writer's attitude or a market
-outcome.
+- **Strength:** Usually lightweight, with fast training and inference. For linear
+  models, the words and phrases contributing to a prediction can be inspected.
+- **Limitation:** Needs representative labeled examples and can miss sarcasm,
+  implied opinions, or relationships between distant words. Inspectable word
+  contributions explain the model's score, not the cause of someone's attitude.
 
-Wang and Manning showed that bigrams and classifier variants materially change
-results. Their findings support using a strong classical baseline, not treating
-one lightly tuned unigram model as representative of classical NLP. ([R03](https://aclanthology.org/P12-2018/))
+Wang and Manning showed that word pairs and classifier choices can materially
+improve sentiment results. This is why a comparison with LLMs should include a
+carefully built classical baseline.
+([R03](https://aclanthology.org/P12-2018/))
 
-Routine preprocessing can destroy useful signals. Removing “not,” stripping
-emoji, or discarding punctuation can hurt sentiment analysis. Fit the vocabulary
-and IDF weights on the training set only. Use regularization and validation rather
-than assuming all stopwords should be removed. Character n-grams can help with
-spelling variation, but do not solve sarcasm or long-range context. This makes
-sparse models strong candidates for repeated, fixed-label tasks with useful
-training data, while complex contextual distinctions can justify another model.
+Keep useful sentiment cues such as “not.” Learn the vocabulary and TF-IDF weights
+from training data only, so test data does not influence the model's preparation.
+For repeated tasks with stable labels, these methods can be practical if their
+measured errors are acceptable; harder contextual cases may favor another model.
 
 ### 4.3 Earlier neural models: CNNs and recurrent networks
 
-Word embeddings represent tokens as dense vectors. A **CNN** applies filters
-over local windows to detect predictive phrase patterns, then pools those features
-for classification. Kim demonstrated a straightforward CNN sentence classifier
-using pretrained embeddings. ([R09](https://aclanthology.org/D14-1181/))
+These models learn patterns from labeled text using **word embeddings**:
+collections of numbers representing words, which can capture similarities
+between them. They provide historical and supporting comparisons to classical
+methods and prompted LLMs.
 
-**RNNs/LSTMs** process sequences and can model order; bidirectional versions use
-both directions within the available text. Recursive models instead combine
-representations along a syntactic tree. Socher and colleagues introduced the
-Stanford Sentiment Treebank and a recursive model for compositional sentiment.
-([R08](https://aclanthology.org/D13-1170/))
+**CNNs (convolutional neural networks)** look for useful patterns in short
+windows of consecutive words, then combine those patterns to predict sentiment.
+Kim's study demonstrates CNN sentence classification with pretrained word
+representations. ([R09](https://aclanthology.org/D14-1181/))
 
-These approaches remain useful historical and experimental baselines. Their
-tradeoffs include training complexity and reliance on the quality of embeddings
-and labeled examples. Static embeddings assign the same initial vector to a word
-across contexts; later contextual models improve on that limitation.
+- **Strength:** Can learn sentiment-bearing phrase patterns and word order
+  within each window, rather than relying only on individual word counts.
+- **Weakness:** Simple window-and-pooling designs can miss relationships across
+  a long sentence, including which aspect a positive or negative phrase describes.
+
+**RNNs (recurrent neural networks)** read words in sequence and carry information
+forward. **LSTMs (long short-term memory networks)** are an RNN variant designed
+to retain useful information over longer sequences. Bidirectional versions read
+in both directions to use surrounding text.
+
+- **Strength:** Can use word order and earlier context to learn distinctions
+  such as negation, provided the training examples support them.
+- **Weakness:** Sequential processing limits parallelism, and long documents,
+  sarcasm, or unfamiliar language can still be difficult. Keeping earlier
+  information does not guarantee that the model interprets it correctly.
+
+**Recursive models** instead combine words and phrases according to a sentence's
+syntactic structure. Socher et al. introduced a recursive sentiment model and
+the Stanford Sentiment Treebank. ([R08](https://aclanthology.org/D13-1170/))
+
+- **Strength:** Explicitly models how smaller phrases combine into a sentence's
+  sentiment, helping study meaning beyond individual words.
+- **Weakness:** Depends on the quality of the sentence structure and training
+  labels; parsing errors or domain changes can weaken predictions.
+
+All these approaches need suitable training data. Traditional static word
+embeddings give a word the same initial representation in every sentence,
+although the network can use surrounding words later. Their ability to learn
+context comes with more training complexity than a simple word-based classifier.
 
 ### 4.4 Fine-tuned transformer classifiers
 
