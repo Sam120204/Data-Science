@@ -22,7 +22,7 @@ attention to financial text.
 
 | Area | Current status |
 |---|---|
-| Literature | 42 references reviewed at the depth recorded in the reading notes |
+| Literature | 46 references reviewed at the depth recorded in the reading notes |
 | Research synthesis | Task definitions, existing methods, tradeoffs, and finance/industry applications documented |
 | Baseline code | Majority class, TF-IDF + logistic regression, LinearSVC, and VADER implemented |
 | Execution | Five runs on constructed examples; 12 automated checks |

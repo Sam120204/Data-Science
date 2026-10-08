@@ -324,80 +324,144 @@ context comes with more training complexity than a simple word-based classifier.
 
 ### 4.4 Fine-tuned transformer classifiers
 
-**BERT** learns contextual token representations through large-scale pretraining.
-For sentiment classification, a classification head maps a pooled sequence
-representation to class logits. Supervised fine-tuning updates the head and
-usually some or all of the encoder using labeled sentiment examples. ([R10](https://aclanthology.org/N19-1423/))
+These models first learn language patterns from large text collections, called
+**pretraining**. They then learn a specific task from labeled examples, called
+**fine-tuning**. For sentiment, a final prediction layer turns the text's learned
+representation into fixed labels such as positive, negative, or neutral.
 
-Self-attention lets a token's representation depend on other tokens, helping with
-context and relationships. A classification head can produce all class scores in
-one forward pass rather than generating a verbal answer token by token.
+**BERT** uses surrounding words to interpret each word. Its **self-attention**
+mechanism lets different parts of the sentence influence one another, helping
+it learn relationships that individual word counts miss.
+([R10](https://aclanthology.org/N19-1423/))
 
-**FinBERT** adapts BERT to financial language and financial sentiment labels.
-The Araci paper evaluates Financial PhraseBank and FiQA; the ProsusAI model card
-describes further financial-domain training and financial sentiment fine-tuning.
-The original comparison explored BERT more thoroughly than its neural
-baselines and found modest differences among additional domain-pretraining
-choices. Its gains should not all be attributed solely to domain pretraining.
-“FinBERT” is used by multiple projects, so a reproducible comparison should name
-the exact checkpoint, tokenizer, label mapping, and revision. ([R12](https://arxiv.org/abs/1908.10063), [R30](https://github.com/ProsusAI/finbert), [R34](https://huggingface.co/ProsusAI/finbert))
+- **Strength:** Can learn contextual distinctions such as negation and conflicting
+  phrases; it predicts labels directly without generating a written answer.
+- **Limitation:** Needs suitable task labels and can still fail on unfamiliar
+  language or sarcasm. Its decisions are harder to inspect than word-based rules.
 
-**DistilBERT** illustrates knowledge distillation: a smaller student learns from
-a larger teacher alongside training objectives. The broader lesson is that
-contextual modeling can be made cheaper; there is no need to equate every neural
-sentiment system with a frontier generative LLM. ([R11](https://arxiv.org/abs/1910.01108))
+**FinBERT** adapts BERT for financial language and sentiment. The Araci paper
+studies Financial PhraseBank and FiQA; the ProsusAI checkpoint provides a
+practical financial sentiment classifier.
+([R12](https://arxiv.org/abs/1908.10063),
+[R30](https://github.com/ProsusAI/finbert), [R34](https://huggingface.co/ProsusAI/finbert))
 
-**TinyBERT** extends this compression example through transformer distillation
-at pretraining and task-specific stages. Its four-layer variant reports more
-than 96.8% of its teacher BERT-Base's GLUE performance while being 7.5 times
-smaller and 9.4 times faster at inference in the original evaluation.
-DistilBERT's abstract reports 40% smaller size, 97% retained language-understanding
-capability, and 60% faster operation. These are historical, configuration-specific
-results, not guaranteed sentiment accuracy or speed on current hardware.
-([R39](https://aclanthology.org/2020.findings-emnlp.372/), [R11](https://arxiv.org/abs/1910.01108))
+- **Strength:** Financial training can help it interpret domain vocabulary more
+  appropriately than a general sentiment model.
+- **Limitation:** Financial sentence sentiment is not automatically company-specific
+  sentiment or sarcasm detection. Performance depends on the exact training data
+  and checkpoint; the original study tuned BERT more thoroughly than its other
+  neural baselines, so its gains cannot all be assigned to domain adaptation.
 
-**Main limitations:** Fine-tuning needs representative labeled examples; a model
-trained on reviews can misread financial news, and changing domains or label
-definitions may require new labels and retraining. Compared with VADER or sparse
-linear models, transformer classifiers usually need more memory and inference
-compute, and their individual decisions are harder to explain. Input-length
-limits can truncate relevant evidence in long documents. They can still fail on
-sarcasm, dialect variation, and unfamiliar language. Compression helps with
-compute demands, but domain shift and robustness still need evaluation.
-([R10](https://aclanthology.org/N19-1423/), [R18](https://aclanthology.org/2020.acl-main.442/), [R25](https://aclanthology.org/2025.findings-acl.441/))
-For model selection, an encoder is worth testing when sparse features miss
-important context but the application still needs a fixed set of sentiment labels.
+**DistilBERT** is a smaller BERT-family model trained partly by learning from a
+larger model. This teacher–student process is called **knowledge distillation**.
+([R11](https://arxiv.org/abs/1910.01108))
+
+- **Strength:** Reduces model size and computation while retaining much of the
+  teacher's language-understanding performance in the original study.
+- **Limitation:** Compression can lose useful capability, and the student still
+  needs sentiment-task training and evaluation on the intended domain.
+
+**TinyBERT** also uses teacher–student training, including a stage for the specific
+application. Its original four-layer model reports a 7.5-times smaller size and
+9.4-times faster inference than BERT-Base in the paper's setup.
+([R39](https://aclanthology.org/2020.findings-emnlp.372/))
+
+- **Strength:** Offers another compact contextual model when memory and inference
+  resources are limited.
+- **Limitation:** Published compression figures are specific to the original
+  experiments; they do not guarantee current sentiment accuracy or serving speed.
+
+**Shared tradeoff:** These classifiers can offer richer context than classical
+features, but usually need more memory and compute than VADER or sparse linear
+models. Input-length limits can cut off relevant text, and domain changes may
+require new labels or retraining. Record the exact model version and label
+mapping. A sentiment-trained BERT or FinBERT is not automatically a validated
+sarcasm detector; that requires separate task evidence.
+([R18](https://aclanthology.org/2020.acl-main.442/),
+[R25](https://aclanthology.org/2025.findings-acl.441/))
 
 ### 4.5 Prompted LLMs: zero-shot and few-shot classification
 
-A generative LLM conditions on an instruction, input text, and optionally labeled
-examples, then produces a label or structured answer.
+A generative LLM receives instructions and text, then produces a sentiment label
+or a structured answer. The prompt should define the target, label meanings,
+and required response format. A valid JSON response is easy to parse, but its
+sentiment label can still be wrong.
+([R13](https://aclanthology.org/2024.findings-naacl.246/),
+[R14](https://arxiv.org/abs/2304.04339))
 
-**Zero-shot** means no labeled demonstrations for this task are supplied in the
-prompt. **Few-shot in-context learning** means a small set of demonstrations is
-included. Neither term implies that the model was never trained, or that its
-pretraining never contained similar tasks. In-context learning generally does
-not update model weights during the request. ([R13](https://aclanthology.org/2024.findings-naacl.246/), [R14](https://arxiv.org/abs/2304.04339))
+**Zero-shot prompting** gives the task instructions without labeled examples.
 
-The prompt should specify the target, the label definitions, the available
-context, and an output schema. Structured decoding can constrain output shape;
-it cannot establish semantic correctness. If label logits are accessible, a
-system can score candidate labels directly, but verbalizer choices and
-calibration still require evaluation.
+- **Strength:** Provides a quick starting point for a new task without training
+  a separate classifier or preparing demonstration examples.
+- **Limitation:** The model may interpret ambiguous labels differently from the
+  application; performance depends on instructions and the model's prior learning.
 
-LLMs can often infer unfamiliar paraphrases, use broader background knowledge,
-and extract multiple opinion elements in one request. They are attractive for
-limited-label tasks and changing schemas. Yet their performance can depend on
-prompt wording, demonstration order, model version, and the exact evaluation
-task. Longer explanations add inference cost and can introduce unsupported
-reasoning. ([R13](https://aclanthology.org/2024.findings-naacl.246/), [R20](https://arxiv.org/abs/2310.11324), [R27](https://aclanthology.org/2026.acl-long.928/))
+**Few-shot prompting** adds a small set of labeled examples to show what the
+application expects. It normally leaves the model's weights unchanged.
 
-An explanation such as “negative because of weak demand” is a generated
-justification, not automatically a faithful account of the model's internal
-computation. The 2026 circuit-analysis paper investigates Gemma-2-2B and Llama-3.1-8B
-across seven datasets, using available sparse autoencoders and binary-filtered
-transfer data. It studies internal mechanisms and interventions; that is a different form of evidence from a prose rationale.
-([R27](https://aclanthology.org/2026.acl-long.928/))
+- **Strength:** Examples can clarify the label policy and improve predictions
+  without a full fine-tuning process.
+- **Limitation:** Example choice and order can change results, and longer prompts
+  add processing cost. A few examples cannot represent every difficult case.
+
+**Shared strengths:** LLMs can use broad contextual knowledge, handle varied
+wording, and return several targets or aspects in one request. Published financial
+results in section 5 demonstrate a real LLM advantage in that study's setting.
+
+**Shared limitations:** Large-model inference and generated responses consume
+resources. Prompt wording and model versions can affect consistency, and fluent
+explanations can contain unsupported reasoning. A written rationale explains what
+the model says about its answer; it does not prove how the prediction was
+internally produced. Representative labeled evaluation is still needed.
+([R13](https://aclanthology.org/2024.findings-naacl.246/),
+[R20](https://arxiv.org/abs/2310.11324), [R27](https://aclanthology.org/2026.acl-long.928/))
+
+#### Which methods handle sarcasm well?
+
+**Sarcasm detection asks whether the text is sarcastic; sentiment classification
+asks what evaluation it expresses toward a target.** Recognizing sarcasm may
+help sentiment analysis, but a sarcasm label does not determine every target's
+polarity. “Great, another outage” illustrates a conflict between praise and an
+unwelcome event. Missing conversation or cultural context can make intended
+sarcasm uncertain even for people. iSarcasmEval uses author-provided labels to
+study intended sarcasm rather than relying only on readers' guesses.
+([R46](https://aclanthology.org/2022.semeval-1.111/))
+
+| Approach | What the evidence supports | Main limitation |
+|---|---|---|
+| VADER/lexicons and ordinary sentiment classifiers | Useful sentiment baselines; their sentiment scores do not establish sarcasm-detection ability. | Positive words can mask criticism, and missing context can defeat literal cues. |
+| Sparse classifiers trained for sarcasm | Can learn recurring sarcastic patterns; the BERT study also evaluates an SVM on sarcasm labels. | Learned word patterns can miss unfamiliar or context-dependent sarcasm. |
+| BERT/RoBERTa trained specifically for sarcasm | Strong candidates with labeled sarcasm examples; dedicated studies show useful results. | General sentiment checkpoints, including FinBERT, do not inherit that validation. |
+| Prompted LLMs | Can recognize sarcastic contrasts; SarcasmBench found GPT-4 leading the tested LLMs and beating trained classifiers on some datasets. | Results varied by dataset; trained contextual classifiers were stronger overall in that study. |
+| A specially trained LLM, Sarcasm-R1 | Reports stronger sarcasm results than its selected baselines across five datasets. | Uses additional training and synthetic reasoning data, rather than ordinary one-prompt classification. |
+
+The papers provide complementary evidence:
+
+- **BERT for sarcasm:** Baruah et al. report F1 of **0.743 on Twitter** and
+  **0.658 on Reddit** in their shared-task tests. Adding the previous reply
+  helped slightly on Twitter but not Reddit; more context was not always better.
+  These are sarcasm-task scores, not sentiment accuracy.
+  ([R43](https://aclanthology.org/2020.figlang-1.12/), Tables 4–5)
+- **Prompted LLMs:** SarcasmBench compares eleven LLMs with trained neural models
+  on six text benchmarks. Its detailed results show that GPT-4 can outperform
+  RoBERTa on particular datasets, while the stronger trained classifiers perform
+  better across the benchmark overall. Few-shot examples often help. The
+  inspected 2024 preprint tests older model versions, not all current LLMs.
+  ([R44](https://arxiv.org/abs/2408.11319), Tables 2–4)
+- **Specialized LLM training:** Sarcasm-R1 reports **72.3% macro F1 on iSarcasm**,
+  compared with **56.8% for RoBERTa** and **59.4% for GPT-4o** in its Table 2.
+  It adapts Qwen2.5-7B with training focused on language, context, and emotional
+  contrast. Its general-model comparisons use zero-shot reasoning prompts;
+  results do not establish superiority over every prompt or future model.
+  ([R45](https://aclanthology.org/2025.findings-emnlp.570/))
+
+For this research, **sarcasm-trained contextual classifiers and appropriately
+prompted or specialized LLMs are credible candidates when sarcasm errors matter**.
+Neither has a universal guarantee. Evaluate sarcasm detection and sentiment on
+sarcastic text separately, using the same relevant examples and permitted context.
+This checks whether additional capability produces useful gains over a classical
+baseline. The cited experiments have not been reproduced locally, and scores
+from different papers should not be compared as if they used identical tests.
 
 ## 5. What the comparative literature supports
 
@@ -573,7 +637,8 @@ useful gains under the application's requirements. The detailed protocol is in
    different questions.
 2. **Find the errors that matter.** Report per-class mistakes and macro F1,
    which balances precision and recall across classes. Check negation, mixed
-   targets, implied sentiment, and relevant language varieties. When mistakes
+   targets, implied sentiment, sarcasm, and relevant language varieties. Score
+   sarcasm detection separately from sentiment on sarcastic text. When mistakes
    have different consequences, evaluate those consequences alongside scores.
 3. **Measure the full operating tradeoff.** Include labeling, adaptation,
    inference, retries, monitoring, and human review. Measure latency and

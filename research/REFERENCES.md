@@ -394,6 +394,73 @@ Aspect-based sentiment application using 1,458 Dutch HR survey responses and Dut
 
 **Review note:** NLP4HR 2024; abstract/metadata inspected. Independently identified; not assumed to match the missing survey citation in the user draft.
 
+<a id="r43"></a>
+## R43: Context-Aware Sarcasm Detection Using BERT
+
+- **Authors:** Arup Baruah; Kaushik Amar Das; Ferdous Ahmed Barbhuiya; Kuntal Dey (names as printed in the PDF).
+- **Publication:** Second Workshop on Figurative Language Processing, 2020.
+- **Source:** [Paper](https://aclanthology.org/2020.figlang-1.12/) · [PDF](https://aclanthology.org/2020.figlang-1.12.pdf).
+
+Compares BERT, BiLSTM, and SVM for sarcasm detection with conversational context.
+Tables 4–5 report BERT F1 of 0.743 on Twitter and 0.658 on Reddit. Context choices
+and training configurations differ; the small Twitter gain from the previous
+reply does not establish that adding more context universally helps.
+
+**Review note:** Primary page and full PDF methods/results inspected. Historical
+sarcasm benchmark, not a current sentiment-model ranking; not reproduced locally.
+
+<a id="r44"></a>
+## R44: SarcasmBench: Towards Evaluating Large Language Models on Sarcasm Understanding
+
+- **Authors:** Yazhou Zhang; Chunwang Zou; Zheng Lian; Prayag Tiwari; Jing Qin.
+- **Source version:** 2024 arXiv preprint, v2.
+- **Source:** [Paper](https://arxiv.org/abs/2408.11319) · [PDF](https://arxiv.org/pdf/2408.11319).
+
+Evaluates eleven LLMs and supervised neural models on six text sarcasm benchmarks
+under zero-shot, few-shot, and step-by-step reasoning prompts. Tables 2–4 show
+strong trained contextual baselines overall, with GPT-4 outperforming them on
+some datasets. Few-shot demonstrations can help. The detailed results support a
+more qualified conclusion than the abstract's broad claim of LLM underperformance.
+
+**Review note:** Primary page and PDF methods/results/limitations inspected.
+Older model versions and dataset-specific results; supervision budgets differ.
+General prompting findings are not a universal ranking or proof that reasoning
+prompts always help or hurt sarcasm detection. Not reproduced locally.
+
+<a id="r45"></a>
+## R45: Sarcasm-R1: Enhancing Sarcasm Detection through Focused Reasoning
+
+- **Authors:** Qi Yang; Liang Yang; Jingjie Zeng; Kai Ma; Hongfei Lin (order as printed in the PDF).
+- **Publication:** Findings of EMNLP, 2025.
+- **Source:** [Paper](https://aclanthology.org/2025.findings-emnlp.570/) · [PDF](https://aclanthology.org/2025.findings-emnlp.570.pdf).
+
+Uses Qwen2.5-7B and reinforcement learning focused on language, context, and
+emotion. It builds synthetic reasoning supervision using other LLMs and quality
+checks. Table 2 reports iSarcasm macro F1 of 72.3% for Sarcasm-R1, 56.8% for
+RoBERTa, and 59.4% for GPT-4o. General-model baselines use zero-shot reasoning
+prompts; this is specialized training rather than an ordinary prompt comparison.
+
+**Review note:** Primary page and PDF methods/results/limitations/Appendix A
+inspected. Five benchmark datasets, subjective labels, unequal adaptation
+resources, and no local reproduction. This shows a promising trained LLM approach,
+not universal superiority or a sentiment accuracy score.
+
+<a id="r46"></a>
+## R46: SemEval-2022 Task 6: iSarcasmEval, Intended Sarcasm Detection in English and Arabic
+
+- **Authors:** Ibrahim Abu Farha; Silviu Vlad Oprea; Steven R. Wilson; Walid Magdy (names as printed in the PDF).
+- **Publication:** SemEval, 2022.
+- **Source:** [Paper](https://aclanthology.org/2022.semeval-1.111/) · [PDF](https://aclanthology.org/2022.semeval-1.111.pdf).
+
+Introduces author-labeled intended sarcasm tasks in English and Arabic, including
+sarcasm detection and paired sarcastic/non-sarcastic rephrases. Explains why
+reader judgments and hashtag-based labels can differ from the author's intent.
+Sarcasm identification and sentiment polarity are related but separate tasks.
+
+**Review note:** Primary page and PDF introduction/data/task design inspected.
+Labels reflect the collection procedure; author intent does not remove all
+ambiguity. Dataset contents and participant systems were not reproduced locally.
+
 <a id="r28"></a>
 <a id="r29"></a>
 <a id="r30"></a>
@@ -433,11 +500,14 @@ comparisons.
 ## Review scope
 
 This is a targeted literature review. Methods/results/limitations were inspected
-in eight PDFs (R03, R12, R13, R24, R25, R26, R27, R35), the publisher HTML for
+in eight original PDFs (R03, R12, R13, R24, R25, R26, R27, R35), the publisher HTML for
 R40, and the official framework section for R41. Other entries were reviewed
 through abstracts, bibliographic metadata, documentation, or model/repository
 cards. R36 and R37 were checked through publisher-supplied metadata rather than
-the full journal articles. Published experiments have not been reproduced here.
+the full journal articles. The sarcasm-focused extension inspected methods,
+results, or task-design sections in four further PDFs (R43–R46), with review
+depth recorded above. Discovery used OpenAlex title searches followed by primary
+ACL Anthology and arXiv pages. Published experiments have not been reproduced here.
 
 The contributed draft included numbered citations without a bibliography. Its
 unidentified survey, Nigerian-tweet, review, and edge-AI studies were not used
