@@ -194,15 +194,24 @@ compound score is a normalized sentiment score, not a calibrated probability
 that the text belongs to a class. Thresholds converting scores into labels must
 be specified. ([R04](https://ojs.aaai.org/index.php/ICWSM/article/view/14550), [R29](https://github.com/cjhutto/vaderSentiment))
 
+- **Strength:** Lightweight, requires no task-specific training labels, and handles common social-media cues through inspectable rules.
+- **Limitation:** Sarcasm, implicit opinions, and financial context can escape its rules; the compound score is not a class probability.
+
 **Loughran–McDonald** provides domain-specific financial word lists, including
 negative, positive, uncertainty, litigious, constraining, and modal categories.
 An uncertainty measure is not simply a negative sentiment measure. The word
 lists and the formula used to aggregate them both form part of the operational
 definition. ([R05](https://sraf.nd.edu/loughranmcdonald-master-dictionary/), [R36](https://doi.org/10.1111/j.1540-6261.2010.01625.x))
 
-Turney's early approach estimates semantic orientation using associations of
+- **Strength:** Financial vocabulary reduces some mismatches of general-purpose dictionaries and supports consistent, inspectable tone measures.
+- **Limitation:** Word counts do not establish sentence meaning or sentiment toward a company; “losses narrowed” illustrates how negative words can describe improvement.
+
+**Turney's semantic-orientation approach** estimates sentiment using associations of
 phrases with positive and negative reference terms. This is a useful historical
 example of sentiment inference without a supervised document classifier. ([R02](https://aclanthology.org/P02-1053/))
+
+- **Strength:** Estimates phrase polarity without labeled sentiment-training examples by using statistical associations.
+- **Limitation:** Association estimates depend on the reference corpus and can be unreliable for rare phrases; averaging phrase scores can lose conflicting aspects.
 
 **SentiWordNet** scores WordNet synsets for positivity, negativity, and
 objectivity/neutrality. It therefore distinguishes word senses rather than
@@ -210,6 +219,9 @@ assigning one score to every occurrence of a word. A system still needs to
 identify the relevant sense and combine scores in context; the resource itself
 does not resolve negation scope or target attribution.
 ([R38](https://aclanthology.org/L10-1531/))
+
+- **Strength:** Distinguishes word senses, offering more detail than a single sentiment value for each spelling.
+- **Limitation:** The system must identify the intended sense and aggregate scores; sense-level values alone do not resolve negation, sarcasm, or targets.
 
 Lexicons work well when transparency, a stable textual measure, or minimal
 training resources matter. Their central limitation is coverage of context and
